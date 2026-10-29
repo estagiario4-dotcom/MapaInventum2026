@@ -1,5 +1,5 @@
 // Gera um QR code (PNG) para cada local do mapa.
-// Uso: npm run qrcodes -- https://endereco-do-cloud-run
+// Uso: npm run qrcodes -- https://endereco-do-site
 import fs from 'node:fs'
 import QRCode from 'qrcode'
 
@@ -7,7 +7,7 @@ const dados = JSON.parse(fs.readFileSync(new URL('../src/dados/mapa.json', impor
 const base = process.argv[2]?.replace(/\/$/, '')
 
 if (!base) {
-  console.log('Uso: npm run qrcodes -- https://endereco-do-cloud-run')
+  console.log('Uso: npm run qrcodes -- https://endereco-do-site')
   process.exit(1)
 }
 

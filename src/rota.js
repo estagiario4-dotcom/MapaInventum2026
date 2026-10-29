@@ -48,28 +48,29 @@ function menorCaminho(grafo, inicio, fim) {
   return { caminho, distancia: dist[fim] }
 }
 
-// Ponto na borda do bloco mais perto do corredor (a "porta" do local)
-// x, y do local = canto superior esquerdo
-export function porta(local, no) {
-  return {
-    x: Math.min(Math.max(no.x, local.x), local.x + local.w),
-    y: Math.min(Math.max(no.y, local.y), local.y + local.h),
-  }
+// Lugares de dentro do Pavilhão usam o ponto e a entrada do Pavilhão
+export function noDe(dados, local) {
+  return local.dentro ? dados.locais.find((l) => l.id === dados.pavilhao).no : local.no
+}
+export function pontoDe(dados, local) {
+  const l = local.dentro ? dados.locais.find((p) => p.id === dados.pavilhao) : local
+  return { x: l.x, y: l.y }
 }
 
-// Rota até o destino mais perto (ex.: quando há mais de um "Banheiros")
-export function calcularRota(dados, grafo, origem, destinos) {
-  let melhor = null
-  for (const destino of destinos) {
-    const r = menorCaminho(grafo, origem.no, destino.no)
-    if (r && (!melhor || r.distancia < melhor.distancia)) melhor = { ...r, destino }
-  }
-  if (!melhor) return null
+// Rota de um lugar até outro.
+// pontos: o caminho (de nó em nó); referencias: lugares com número que ficam no caminho
+export function calcularRota(dados, grafo, origem, destino) {
+  const r = menorCaminho(grafo, noDe(dados, origem), noDe(dados, destino))
+  if (!r) return null
 
-  const pontos = [
-    porta(origem, dados.nos[origem.no]),
-    ...melhor.caminho.map((id) => dados.nos[id]),
-    porta(melhor.destino, dados.nos[melhor.destino.no]),
-  ]
-  return { destino: melhor.destino, pontos }
+  const pontos = r.caminho.map((id) => dados.nos[id])
+  const meio = r.caminho.slice(1, -1)
+  const referencias = []
+  for (const id of meio) {
+    for (const l of dados.locais) {
+      if (l.numero && l.no === id && l.id !== origem.id && l.id !== destino.id && !referencias.includes(l)) referencias.push(l)
+    }
+  }
+
+  return { destino, pontos, referencias, metros: r.distancia * dados.metrosPorUnidade }
 }

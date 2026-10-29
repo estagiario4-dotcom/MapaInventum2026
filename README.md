@@ -1,16 +1,13 @@
 # Mapa Inventum 2026
 
-Mapa do evento para celular, no estilo dos apps de mapa: busca em cima, mapa no meio e painel embaixo. A pessoa escaneia o QR code e aparece "Você está aqui". Ela toca no lugar no mapa (ou usa a busca e os atalhos) e o mapa mostra a rota.
+Mapa do evento para celular. A base é a imagem oficial do mapa (`public/mapa-inventum.webp`), com os mesmos números (1 a 18). A pessoa escaneia o QR code e aparece "Você está aqui". Ela toca no número do lugar no mapa (ou escolhe na lista) e aparece a rota. Tocar de novo no mesmo número (ou no X) desmarca.
 
-- No celular, o mapa abre perto de "Você está aqui". "Ver o mapa todo" mostra o evento inteiro. Arrastar move o mapa, e dois dedos ou os botões + / − dão zoom.
-- Os nomes ficam com tamanho fixo na tela. Quando o nome não cabe no bloco, aparece um ícone com o nome embaixo, sem sobrepor outros nomes.
-- Atalhos no painel (Banheiros, Comida, Palcos, Estandes, Atrações, Entradas) destacam esses lugares no mapa e mostram a lista.
-- Tocar num lugar marca o destino e traça a rota azul, sem mexer no zoom. Um X na etiqueta do lugar (e no painel) desmarca. O painel mostra o tempo a pé, calculado pelas medidas reais (1 metro = 4 unidades do mapa).
-- Sem QR code, o primeiro toque (ou a busca) marca onde a pessoa está.
-- **Street View:** no painel do destino, o botão "Street View" abre o Google Street View na rua mais próxima, já virado para o lugar (para lugares dentro do pavilhão, mostra a fachada do pavilhão). O botão do bonequinho no mapa liga um modo em que o toque em qualquer ponto abre o Street View dali. Usa o link oficial do Google Maps (não precisa de chave de API); no celular abre o app do Google Maps. O Google sempre mostra a foto mais próxima do ponto, e dentro do parque normalmente só existem fotos das ruas em volta. A conversão do mapa para latitude/longitude fica em `geo`, no `mapa.json`, e o código em `src/streetview.js`.
-- A base do mapa (ruas, prédios, cerca do parque, kartódromo, lago e matas) vem do **OpenStreetMap**, com as medidas reais. Por isso o crédito "© OpenStreetMap" aparece no canto do mapa e precisa ficar (licença ODbL). Os dados ficam dentro do app, então o mapa funciona sem buscar nada na internet.
-- Os nomes vêm dos cards do Miro "Inventum 2026 – Mapa dos Estandes" (onde não há card, do número da tabela do Miro). A planta dos estandes foi encaixada no contorno real do Centro de Eventos.
-- A rota anda **só por dentro do parque** (caminhos internos do OSM, dentro da cerca), nunca pelas ruas de fora. Além dos caminhos do OSM, há a entrada principal do pavilhão (lado oeste), os portões do meio (norte e sul), o caminho do pavilhão até a pista e a passagem pelo gramado de dentro da pista até os boxes do kartódromo. O teste `scripts/testar-rotas.mjs` confere todas as rotas.
+- A rota é uma linha azul por cima da imagem, do número de origem até o número de destino, seguindo os caminhos do evento.
+- O painel mostra "Como chegar" em passos: de onde sair, por quais números passar e onde chegar, com o tempo a pé.
+- A lista tem duas abas: **Área externa** (números 1 a 17) e **Dentro do Pavilhão** (as atrações do 18). Para as atrações de dentro, a rota leva até a entrada do Pavilhão.
+- O mapa ocupa a tela toda. O card de baixo sempre mostra a dica do que fazer em cada etapa, e o botão redondo volta o mapa para onde a pessoa está.
+- Um X na etiqueta "Você está aqui", na do destino e no painel desmarca. Arrastar move o mapa, e dois dedos dão zoom (no computador, a roda do mouse ou os botões + / −).
+- Sem QR code, o primeiro toque marca onde a pessoa está.
 
 ## Rodar local
 
@@ -19,28 +16,40 @@ npm install
 npm run dev
 ```
 
-Abrir `http://localhost:5173/?aqui=food-trucks` (o `aqui` é o `id` de um local).
+Abrir `http://localhost:5173/?aqui=food-truck` (o `aqui` é o `id` de um local).
 
 ## Mudar o mapa: tudo em `src/dados/mapa.json`
 
-- **locais**: cada lugar que dá para tocar e buscar
-  - `id`: vai no QR code (`?aqui=id`). Não mudar depois de imprimir.
-  - `nome`: aparece no mapa e na busca. Locais com o mesmo nome (ex.: "Banheiros") viram um destino só, e a rota vai para o mais perto.
-  - `dica` (opcional): texto extra, também entra na busca (ex.: "Animais empalhados").
-  - `x`, `y`: canto superior esquerdo do bloco. `w`, `h`: largura e altura.
-  - `forma` (opcional): `"circulo"` desenha redondo.
-  - `no`: em qual ponto de caminho o local se liga. A rota chega por ele.
-- `pontos` (opcional): contorno do lugar, quando não é retângulo. `dentro: true` marca os lugares de dentro do pavilhão.
-- **chao**: a base do mapa, vinda do OpenStreetMap (1 metro = 4 unidades): `parque` (área dentro da cerca), `areas` (estacionamentos, campos, lotes), `matas`, `ruas` (`tipo: "rua"` com `nome`, ou `tipo: "interna"` para os caminhos do parque), `pista` do kartódromo, `cercas`, `predios` e o `pavilhao`.
-- **nos** e **caminhos**: pontos e ligações por onde a rota anda (caminhos reais do parque e corredores do pavilhão).
-- **mapa**: limites da visão "mapa todo".
+As posições são medidas na imagem com largura 1600 e altura 800 (`imagem.largura` e `imagem.altura`), não importa o tamanho real do arquivo.
 
-**Estande mudou de dono?** Trocar o `nome`. **Mudou de lugar?** Trocar `x`, `y` e `no`. Depois fazer o deploy de novo.
+- **imagem**: o arquivo do mapa (fica em `public/`).
+- **locais**: cada lugar.
+  - `id`: vai no QR code (`?aqui=id`). Não mudar depois de imprimir.
+  - `numero`: o número que aparece na imagem.
+  - `nome`: aparece na lista e nos passos.
+  - `rotulo`: nome curto que aparece no mapa ao lado do número (ex.: "Artesanato").
+  - `x`, `y`: onde fica o número na imagem (é onde a pessoa toca).
+  - `no`: em qual ponto do caminho o lugar se liga. A rota chega por ele.
+  - `dentro: true`: atração de dentro do Pavilhão (não tem `x`, `y` nem `no`; usa os do Pavilhão).
+- **pavilhao**: o `id` do lugar que representa o Pavilhão (o 18).
+- **nos**: pontos dos caminhos (`x`, `y` na imagem).
+- **caminhos**: ligações entre dois nós. A rota só anda por elas.
+- **metrosPorUnidade**: usado para o tempo a pé (aproximado).
+
+**Lugar mudou de nome?** Trocar o `nome`. **Mudou de lugar?** Trocar `x`, `y` e `no`.
+
+### Quando chegar a versão final da imagem
+
+1. Exporte a imagem nova (2:1, de preferência com 3200 px de largura) e salve por cima de `public/mapa-inventum.webp` (ou troque `imagem.arquivo`).
+2. Abra com `?editor` (ex.: `http://localhost:5173/?editor`) e toque em cada número e em cada curva dos caminhos para ver o `x, y`.
+3. Atualize `locais`, `nos` e `caminhos` no JSON e rode `node scripts/testar-rotas.mjs`.
+
+Se a imagem nova não for 2:1, mude também `imagem.largura` e `imagem.altura` para a mesma proporção.
 
 ### Modo editor
 
-Abrir com `&editor` no final, ex.: `http://localhost:5173/?aqui=food-trucks&editor`.
-Mostra os caminhos (linhas vermelhas) e o nome de cada nó, e ao tocar no mapa mostra o `x, y` daquele ponto para colocar no JSON.
+Abrir com `?editor` no final, ex.: `http://localhost:5173/?aqui=food-truck&editor`.
+Mostra os caminhos (linhas rosa), os nós (pontos amarelos com o nome) e a ligação de cada número ao seu nó (linhas azuis tracejadas). Ao tocar no mapa, mostra o `x, y` daquele ponto para colocar no JSON.
 
 ### Conferir as rotas
 
@@ -48,7 +57,7 @@ Mostra os caminhos (linhas vermelhas) e o nome de cada nó, e ao tocar no mapa m
 node scripts/testar-rotas.mjs
 ```
 
-Testa todas as combinações de origem e destino e avisa se algum lugar ficou fora da cerca, se alguma rota falhou ou se alguma rota sai do parque.
+Confere se todos os nós existem e se dá para ir de qualquer lugar para qualquer outro.
 
 ## Deploy na Vercel
 

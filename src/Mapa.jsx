@@ -1,100 +1,32 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import dados from './dados/mapa.json'
+import { pontoDe } from './rota'
 
-const M = dados.mapa
-const C = dados.chao
-export const MAPA_INTEIRO = { x: M.x0, y: M.y0, w: M.largura, h: M.altura }
-const centro = (l) => ({ x: l.x + l.w / 2, y: l.y + l.h / 2 })
-const lista = (pts) => pts.map((p) => p.join(',')).join(' ')
+const IMG = dados.imagem
+export const MAPA_INTEIRO = { x: 0, y: 0, w: IMG.largura, h: IMG.altura }
+const numerados = dados.locais.filter((l) => l.numero)
+const linha = (pts) => pts.map((p) => `${p.x},${p.y}`).join(' ')
+const numeroDe = (l) => (l.dentro ? dados.locais.find((p) => p.id === dados.pavilhao).numero : l.numero)
 
-// ---------- ícones (desenhados em 24x24, traço branco) ----------
-const ICONES = {
-  estande: 'M4 10h16v10H4zM3 5h18l-1.2 5H4.2zM10 20v-5h4v5',
-  atracao: 'M12 3.5l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.4l-5.1 2.7 1-5.6-4.1-4 5.7-.8z',
-  palco: 'M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM6 11a6 6 0 0 0 12 0M12 17v4M9 21h6',
-  alimentacao: 'M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M16 3c-2.5 2-2.5 7 0 8.5V21',
-  servico: 'M12 8v.5M12 11v6M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z',
-  acesso: 'M4 12h11M11 7l5 5-5 5M20 4v16',
-  banheiro: 'M7 5.5a1.5 1.5 0 1 0 0-.01M5 9h4l-.5 6H8v5H6v-5h-.5zM17 5.5a1.5 1.5 0 1 0 0-.01M15.5 9h3l1.5 6h-2v5h-2v-5h-2zM12 4v16',
-}
-export const iconeDe = (l) => (l.nome === 'Banheiros' ? ICONES.banheiro : ICONES[l.categoria])
-
-// ---------- textos com tamanho fixo na tela ----------
-const FONTE = 11.5 // px
-const largTexto = (t) => t.length * FONTE * 0.56
-
-// quebra o nome em até 2 linhas que caibam em "max" pixels
-function linhasQueCabem(nome, max) {
-  if (largTexto(nome) <= max) return [nome]
-  const palavras = nome.split(' ')
-  for (let i = palavras.length - 1; i > 0; i--) {
-    const a = palavras.slice(0, i).join(' ')
-    const b = palavras.slice(i).join(' ')
-    if (largTexto(a) <= max && largTexto(b) <= max) return [a, b]
-  }
-  return null
-}
-
-// rótulo de rua: no meio do trecho mais comprido, sempre em pé
-function rotuloDaRua(pontos) {
-  let melhor = null
-  for (let i = 0; i < pontos.length - 1; i++) {
-    const [x1, y1] = pontos[i]
-    const [x2, y2] = pontos[i + 1]
-    const tam = Math.hypot(x2 - x1, y2 - y1)
-    if (!melhor || tam > melhor.tam) {
-      let ang = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI
-      if (ang > 90) ang -= 180
-      if (ang <= -90) ang += 180
-      melhor = { tam, x: (x1 + x2) / 2, y: (y1 + y2) / 2, ang }
-    }
-  }
-  return melhor
-}
-
-// tudo o que não muda: chão, matas, ruas, pista, prédios e pavilhão (geometria do OpenStreetMap)
-function Chao() {
-  const pav = C.pavilhao
+// bolinha com o número, desenhada por cima do número da imagem (tamanho fixo na tela)
+function Marcador({ p, px, cor, texto, pulso }) {
   return (
-    <>
-      <polygon className="parque" points={lista(C.parque)} />
-      {C.areas.map((a, i) => <polygon key={i} className={`area area-${a.tipo}`} points={lista(a.pontos)} />)}
-      {C.matas.map((m, i) => <polygon key={i} points={lista(m)} fill="url(#mata)" className="mata" />)}
-
-      <polyline className="pista-borda" points={lista(C.pista)} />
-      <polyline className="pista" points={lista(C.pista)} />
-
-      {C.ruas.filter((r) => r.tipo === 'interna').map((r, i) => (
-        <g key={i}>
-          <polyline className="caminho-borda" points={lista(r.pontos)} strokeWidth={r.largura + 4} />
-          <polyline className="caminho" points={lista(r.pontos)} strokeWidth={r.largura} />
-        </g>
-      ))}
-      {C.ruas.filter((r) => r.tipo === 'rua').map((r, i) => (
-        <polyline key={i} className="rua-borda" points={lista(r.pontos)} strokeWidth={r.largura + 6} />
-      ))}
-      {C.ruas.filter((r) => r.tipo === 'rua').map((r, i) => (
-        <polyline key={i} className="rua" points={lista(r.pontos)} strokeWidth={r.largura} />
-      ))}
-
-      {C.cercas.map((c, i) => <polyline key={i} className="cerca" points={lista(c)} />)}
-      {C.predios.map((pr, i) => <polygon key={i} className="predio" points={lista(pr.pontos)} />)}
-
-      <polygon className="pav-parede" points={lista(pav.parede)} />
-      <polygon className="pav-piso" points={lista(pav.piso)} />
-      <polygon className="pav-saguao" points={lista(pav.saguao)} />
-    </>
+    <g className="sem-toque" transform={`translate(${p.x} ${p.y}) scale(${px})`}>
+      {pulso && <circle r="26" fill={cor} fillOpacity=".3" className="pulso" />}
+      <circle r="19" fill={cor} stroke="#fff" strokeWidth="4" />
+      <text className="marcador-num" fontSize={String(texto).length > 1 ? 16 : 19}>{texto}</text>
+    </g>
   )
 }
 
-export default function Mapa({ foco, margem, pontos, origem, destino, destaque, aoTocar, aoLimpar, modoStreetView, aoAlternarStreetView, aoTocarPonto, editor }) {
+export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoLimpar, aoLimparOrigem, editor }) {
   const caixa = useRef(null)
   const ponteiros = useRef(new Map())
   const gesto = useRef(null)
+  const rotulosNaTela = useRef([])
   const [tam, setTam] = useState({ w: 0, h: 0 })
   const [vb, setVb] = useState(null)
   const [clique, setClique] = useState(null)
-  const chao = useMemo(() => <Chao />, [])
 
   useEffect(() => {
     const obs = new ResizeObserver(([e]) => setTam({ w: e.contentRect.width, h: e.contentRect.height }))
@@ -102,31 +34,68 @@ export default function Mapa({ foco, margem, pontos, origem, destino, destaque, 
     return () => obs.disconnect()
   }, [])
 
-  // enquadra uma caixa do mapa na parte livre da tela (entre a busca e o painel)
-  function enquadrar(b) {
+  // o mapa ocupa a tela toda: não afasta além da imagem.
+  // Pode arrastar um pouco além da borda só o suficiente para nada ficar escondido atrás do painel.
+  function limitar(v) {
+    const maxW = Math.min(IMG.largura, IMG.altura * (tam.w / tam.h))
+    const cx = v.x + v.w / 2
+    const cy = v.y + v.h / 2
+    const w = Math.min(Math.max(v.w, 120), maxW)
+    const h = w * (tam.h / tam.w)
+    const k = w / tam.w
+    const topo = (margem?.topo || 0) * k
+    const baixo = (margem?.baixo || 0) * k
+    const esquerda = (margem?.esquerda || 0) * k
+    const x = Math.min(Math.max(cx - w / 2, -esquerda), IMG.largura - w)
+    const y = Math.min(Math.max(cy - h / 2, -topo), IMG.altura - h + baixo)
+    return { x, y, w, h }
+  }
+
+  // enquadra uma caixa do mapa na parte livre da tela (acima do painel)
+  // "manter": ponto que precisa aparecer quando a caixa não cabe na tela (ex.: onde a pessoa está)
+  // "mover": só arrasta o mapa até a caixa, sem mudar o zoom
+  function enquadrar(b, manter, mover) {
     const topo = margem?.topo || 0
     const baixo = margem?.baixo || 0
+    const esquerda = margem?.esquerda || 0
     const livreH = Math.max(tam.h - topo - baixo, 120)
-    const escala = Math.max(b.w / (tam.w - 24), b.h / livreH) * 1.08
-    setVb({
-      x: b.x + b.w / 2 - (tam.w / 2) * escala,
+    const livreW = Math.max(tam.w - esquerda - 24, 120)
+    // escala (unidades do mapa por pixel), sem passar do zoom máximo e do mínimo
+    const maxEscala = Math.min(IMG.largura, IMG.altura * (tam.w / tam.h)) / tam.w
+    const escala = mover && vb ? vb.w / tam.w
+      : Math.min(Math.max(Math.max(b.w / livreW, b.h / livreH) * 1.08, 120 / tam.w), maxEscala)
+    let v = {
+      x: b.x + b.w / 2 - (esquerda + 12 + livreW / 2) * escala,
       y: b.y + b.h / 2 - (topo + livreH / 2) * escala,
       w: tam.w * escala,
       h: tam.h * escala,
-    })
+    }
+    if (manter) {
+      const folga = 60 * escala
+      const x1 = v.x + esquerda * escala + folga
+      const x2 = v.x + v.w - folga
+      const y1 = v.y + topo * escala + folga
+      const y2 = v.y + v.h - baixo * escala - folga
+      const dx = manter.x < x1 ? manter.x - x1 : manter.x > x2 ? manter.x - x2 : 0
+      const dy = manter.y < y1 ? manter.y - y1 : manter.y > y2 ? manter.y - y2 : 0
+      v = { ...v, x: v.x + dx, y: v.y + dy }
+    }
+    // não mostra faixa vazia embaixo da imagem se não precisar
+    const yMax = Math.max(IMG.altura - v.h, b.y + b.h - (v.h - baixo * escala))
+    v = limitar({ ...v, y: Math.min(v.y, yMax) })
+    setVb(v)
   }
 
   useEffect(() => {
-    if (tam.w && foco) enquadrar(foco.caixa)
-  }, [foco, tam.w, tam.h]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (tam.w && foco) enquadrar(foco.caixa, foco.manter, foco.mover)
+    // refaz quando o painel muda de tamanho, para a rota não ficar escondida atrás dele
+  }, [foco, tam.w, tam.h, margem?.baixo, margem?.esquerda]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function zoomEm(px, py, fator) {
     setVb((v) => {
-      const w = Math.min(Math.max(v.w * fator, 60), M.largura * 1.6)
-      const f = w / v.w
       const mx = v.x + (px / tam.w) * v.w
       const my = v.y + (py / tam.h) * v.h
-      return { x: mx - (mx - v.x) * f, y: my - (my - v.y) * f, w, h: v.h * f }
+      return limitar({ x: mx - (mx - v.x) * fator, y: my - (my - v.y) * fator, w: v.w * fator, h: v.h * fator })
     })
   }
 
@@ -164,7 +133,7 @@ export default function Mapa({ foco, margem, pontos, origem, destino, destaque, 
       if (!g?.moveu) return
       const dx = ((agora.x - antes.x) / tam.w) * vb.w
       const dy = ((agora.y - antes.y) / tam.h) * vb.h
-      setVb((v) => ({ ...v, x: v.x - dx, y: v.y - dy }))
+      setVb((v) => limitar({ ...v, x: v.x - dx, y: v.y - dy }))
     } else if (ponteiros.current.size === 2) {
       const outro = [...ponteiros.current.entries()].find(([id]) => id !== e.pointerId)[1]
       const distAntes = Math.hypot(antes.x - outro.x, antes.y - outro.y)
@@ -178,79 +147,80 @@ export default function Mapa({ foco, margem, pontos, origem, destino, destaque, 
     if (ponteiros.current.size > 0) return
     const g = gesto.current
     gesto.current = null
-    if (!g || g.moveu) return
-    // modo Street View: o toque escolhe um ponto do mapa, não um lugar
-    if (modoStreetView && vb) {
-      const p = pos(e)
-      aoTocarPonto({ x: vb.x + (p.x / tam.w) * vb.w, y: vb.y + (p.y / tam.h) * vb.h })
-      return
+    if (!g || g.moveu || !vb) return
+    const p = pos(e)
+    const ponto = { x: vb.x + (p.x / tam.w) * vb.w, y: vb.y + (p.y / tam.h) * vb.h }
+    if (editor) setClique({ x: Math.round(ponto.x), y: Math.round(ponto.y) })
+    // toque num nome escolhe esse lugar
+    const nome = rotulosNaTela.current.find((r) => p.x >= r.x1 && p.x <= r.x2 && p.y >= r.y1 && p.y <= r.y2)
+    if (nome) return aoTocar(nome.id)
+    // toque perto de um número escolhe esse lugar
+    const raio = Math.max(26, 26 * (vb.w / tam.w))
+    let perto = null
+    for (const l of numerados) {
+      const d = Math.hypot(l.x - ponto.x, l.y - ponto.y)
+      if (d < raio && (!perto || d < perto.d)) perto = { l, d }
     }
-    const alvo = document.elementFromPoint(e.clientX, e.clientY)?.closest('[data-local]')
-    if (alvo) aoTocar(alvo.dataset.local)
-    if (editor && vb) {
-      const p = pos(e)
-      setClique({ x: Math.round(vb.x + (p.x / tam.w) * vb.w), y: Math.round(vb.y + (p.y / tam.h) * vb.h) })
-    }
+    if (perto) aoTocar(perto.l.id)
   }
 
   // 1 pixel da tela em unidades do mapa
   const px = vb ? vb.w / tam.w : 1
   const naTela = (p) => ({ x: ((p.x - vb.x) / vb.w) * tam.w, y: ((p.y - vb.y) / vb.h) * tam.h })
 
-  const pontoOrigem = origem ? (pontos ? pontos[0] : centro(origem)) : null
-  const pontoDestino = destino ? (pontos ? pontos[pontos.length - 1] : centro(destino)) : null
+  const pOrigem = origem ? pontoDe(dados, origem) : null
+  const pDestino = destino ? pontoDe(dados, destino) : null
+  const pontos = rota?.pontos
 
+  // etiqueta do destino (com X), presa em cima do número
+  let etiqueta = null
+  if (vb && pDestino) {
+    const t = naTela(pDestino)
+    etiqueta = { x: Math.min(Math.max(t.x, 110), tam.w - 110), y: Math.max(t.y, (margem?.topo || 0) + 60) }
+  }
 
-  // decide onde vai cada nome: dentro do bloco, embaixo do ícone, ou some (sem sobrepor)
+  // nomes curtos ao lado de cada número, sem cobrir outros números nem outros nomes
   const rotulos = []
   if (vb) {
-    const ocupado = []
-    const livre = (r) => !ocupado.some((o) => r.x1 < o.x2 && r.x2 > o.x1 && r.y1 < o.y2 && r.y2 > o.y1)
-    const prioridade = (l) => (destino && l.id === destino.id ? 1e12 : 0) + (origem && l.id === origem.id ? 1e11 : 0)
-      + (destaque?.has(l.id) ? 1e10 : 0) + l.w * l.h
-    const visiveis = dados.locais.filter((l) => l.x + l.w > vb.x && l.x < vb.x + vb.w && l.y + l.h > vb.y && l.y < vb.y + vb.h)
-    for (const l of visiveis.sort((a, b) => prioridade(b) - prioridade(a))) {
-      const cx = l.texto ? l.texto[0] + l.texto[2] / 2 : l.x + l.w / 2
-      const cy = l.texto ? l.texto[1] + l.texto[3] / 2 : l.y + l.h / 2
-      const wPx = (l.texto ? l.texto[2] : l.w) / px
-      const hPx = (l.texto ? l.texto[3] : l.h) / px
-      const t = naTela({ x: cx, y: cy })
-      const base = { id: l.id, cor: dados.categorias[l.categoria].cor, apagado: destaque && !destaque.has(l.id), ativo: destino && l.id === destino.id }
-
-      // 1) cabe dentro do bloco
-      const dentro = hPx >= 18 ? linhasQueCabem(l.nome, wPx - 8) : null
-      if (dentro && (dentro.length === 1 || hPx >= 32)) {
-        const alt = dentro.length * FONTE * 1.2
-        const larg = Math.max(...dentro.map(largTexto))
-        ocupado.push({ x1: t.x - larg / 2, x2: t.x + larg / 2, y1: t.y - alt / 2, y2: t.y + alt / 2 })
-        rotulos.push({ ...base, linhas: dentro, tx: cx, ty: cy - ((dentro.length - 1) / 2) * FONTE * 1.2 * px })
-        continue
-      }
-      // 2) ícone no bloco e nome embaixo, se houver espaço
-      const icone = { x1: t.x - 8, x2: t.x + 8, y1: t.y - 8, y2: t.y + 8 }
-      if (!livre(icone)) continue
-      const fora = linhasQueCabem(l.nome, 120) || [l.nome]
-      const larg = Math.max(...fora.map(largTexto))
-      const texto = { x1: t.x - larg / 2 - 2, x2: t.x + larg / 2 + 2, y1: t.y + 9, y2: t.y + 11 + fora.length * FONTE * 1.2 }
-      ocupado.push(icone)
-      if (livre(texto)) {
-        ocupado.push(texto)
-        rotulos.push({ ...base, icone: iconeDe(l), cx, cy, linhas: fora, fora: true, tx: cx, ty: cy + (9 + FONTE * 0.6) * px })
-      } else {
-        rotulos.push({ ...base, icone: iconeDe(l), cx, cy, linhas: [] })
-      }
+    const R = 16 / px + 2 // raio do número da imagem, em pixels da tela
+    const ocupado = numerados.map((l) => {
+      const t = naTela(l)
+      return { x1: t.x - R, x2: t.x + R, y1: t.y - R, y2: t.y + R }
+    })
+    if (pOrigem) {
+      const t = naTela(pOrigem)
+      const x = Math.min(Math.max(t.x, 80), tam.w - 80)
+      ocupado.push({ x1: x - 75, x2: x + 75, y1: t.y + 28, y2: t.y + 64 })
+    }
+    if (etiqueta) {
+      const larg = Math.min(destino.nome.length * 8 + 56, 230)
+      ocupado.push({ x1: etiqueta.x - larg / 2, x2: etiqueta.x + larg / 2, y1: etiqueta.y - 72, y2: etiqueta.y - 26 })
+    }
+    const livre = (r) => r.x1 >= 4 && r.x2 <= tam.w - 4 && r.y1 >= 4 && r.y2 <= tam.h - (margem?.baixo || 0) - 4
+      && !ocupado.some((o) => r.x1 < o.x2 && r.x2 > o.x1 && r.y1 < o.y2 && r.y2 > o.y1)
+    const ordem = [...numerados].sort((a, b) => (origem?.id === b.id) - (origem?.id === a.id) || a.numero - b.numero)
+    for (const l of ordem) {
+      if (destino && l.id === destino.id) continue // o destino já tem a etiqueta com o nome
+      const t = naTela(l)
+      if (t.x < -100 || t.x > tam.w + 100 || t.y < -40 || t.y > tam.h + 40) continue
+      const w = l.rotulo.length * 6.4 + 14
+      const h = 20
+      const opcoes = [
+        { x1: t.x + R + 2, y1: t.y - h / 2 }, // à direita
+        { x1: t.x - w / 2, y1: t.y + R + 1 }, // embaixo
+        { x1: t.x - R - 2 - w, y1: t.y - h / 2 }, // à esquerda
+        { x1: t.x - w / 2, y1: t.y - R - 1 - h }, // em cima
+      ].map((o) => ({ ...o, x2: o.x1 + w, y2: o.y1 + h }))
+      const r = opcoes.find(livre)
+      if (!r) continue
+      ocupado.push(r)
+      rotulos.push({ ...r, id: l.id, texto: l.rotulo, pav: l.id === dados.pavilhao })
     }
   }
-
-  // etiqueta do destino (com X), presa em cima do lugar
-  let etiqueta = null
-  if (vb && destino) {
-    const t = naTela({ x: destino.x + destino.w / 2, y: destino.y })
-    etiqueta = { x: Math.min(Math.max(t.x, 100), tam.w - 100), y: Math.max(t.y, (margem?.topo || 0) + 40) }
-  }
+  rotulosNaTela.current = rotulos
 
   return (
-    <div className={`mapa${modoStreetView ? ' modo-street' : ''}`} ref={caixa}>
+    <div className="mapa" ref={caixa}>
       {vb && (
         <svg
           viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
@@ -259,117 +229,61 @@ export default function Mapa({ foco, margem, pontos, origem, destino, destaque, 
           onPointerUp={aoSoltar}
           onPointerCancel={aoSoltar}
         >
-          <defs>
-            <pattern id="mata" width="44" height="40" patternUnits="userSpaceOnUse">
-              <rect width="44" height="40" fill="#d3e6c6" />
-              <circle cx="10" cy="11" r="9" fill="#c4dcb4" />
-              <circle cx="32" cy="15" r="11" fill="#c8dfb9" />
-              <circle cx="18" cy="31" r="8" fill="#c1d9b0" />
-              <circle cx="40" cy="35" r="7" fill="#c6ddb6" />
-            </pattern>
-            <pattern id="ondas" width="36" height="18" patternUnits="userSpaceOnUse">
-              <path d="M2 9q4.5-4.5 9 0t9 0" fill="none" stroke="#ffffff" strokeOpacity=".7" strokeWidth="1.5" strokeLinecap="round" />
-            </pattern>
-          </defs>
+          <image href={IMG.arquivo} x="0" y="0" width={IMG.largura} height={IMG.altura} preserveAspectRatio="none" />
 
-          <rect x={vb.x - vb.w} y={vb.y - vb.h} width={vb.w * 3} height={vb.h * 3} className="fundo" />
-          {chao}
-
-          {/* nomes das ruas da cidade */}
-          {C.ruas.filter((r, i, todas) => r.nome && todas.findIndex((o) => o.nome === r.nome) === i).map((r, i) => {
-            const m = rotuloDaRua(r.pontos)
-            return (
-              <text key={i} className="rotulo-rua" x={m.x} y={m.y} fontSize={11 * px} strokeWidth={3 * px}
-                transform={`rotate(${m.ang} ${m.x} ${m.y})`}>{r.nome}</text>
-            )
-          })}
-
-          {px > 1.6 && C.zonas.map((z) => (
-            <text key={z.nome} className="rotulo-zona" x={z.x} y={z.y} fontSize={12 * px} strokeWidth={3 * px}>{z.nome}</text>
-          ))}
+          {/* deixa o resto do mapa mais apagado quando tem rota, para a linha aparecer */}
+          {pontos && <rect x="0" y="0" width={IMG.largura} height={IMG.altura} className="veu" />}
 
           {editor && dados.caminhos.map(([a, b]) => (
-            <line key={a + b} className="corredor" strokeWidth={1.5 * px}
+            <line key={a + b} className="corredor" strokeWidth={2 * px}
               x1={dados.nos[a].x} y1={dados.nos[a].y} x2={dados.nos[b].x} y2={dados.nos[b].y} />
           ))}
-
-          {/* lugares: formas */}
-          {dados.locais.map((l) => {
-            const cor = dados.categorias[l.categoria].cor
-            const eDestino = destino && l.id === destino.id
-            const eOrigem = origem && l.id === origem.id
-            const apagado = destaque && !destaque.has(l.id)
-            const agua = l.estilo === 'agua'
-            const forma = (props) => l.pontos
-              ? <polygon points={lista(l.pontos)} {...props} />
-              : l.forma === 'circulo'
-                ? <ellipse cx={l.x + l.w / 2} cy={l.y + l.h / 2} rx={l.w / 2} ry={l.h / 2} {...props} />
-                : <rect x={l.x} y={l.y} width={l.w} height={l.h} rx={Math.min(l.w, l.h, 12 * px) * 0.25} {...props} />
-            return (
-              <g key={l.id} data-local={l.id} className={`local${apagado ? ' apagado' : ''}`}>
-                {forma({ className: agua ? 'lago' : 'local-base' })}
-                {!agua && forma({ fill: cor, fillOpacity: eDestino ? 0.9 : 0.16 })}
-                {agua && forma({ fill: 'url(#ondas)' })}
-                {forma({
-                  fill: 'none',
-                  stroke: eDestino ? 'var(--destino)' : eOrigem ? 'var(--voce)' : cor,
-                  strokeOpacity: eDestino || eOrigem ? 1 : 0.55,
-                  strokeWidth: (eDestino || eOrigem ? 2.5 : 1) * px,
-                })}
-              </g>
-            )
-          })}
-
-          {/* lugares: nomes e ícones, sem sobrepor */}
-          {rotulos.map((r) => (
-            <g key={r.id} className={`sem-toque${r.apagado ? ' apagado' : ''}`}>
-              {r.icone && (
-                <g transform={`translate(${r.cx - 7 * px} ${r.cy - 7 * px}) scale(${(14 * px) / 24})`}>
-                  <circle cx="12" cy="12" r="12" fill={r.cor} stroke="#fff" strokeWidth="2" />
-                  <path d={r.icone} transform="translate(4.8 4.8) scale(.6)" className="icone" />
-                </g>
-              )}
-              {r.linhas.map((t, i) => (
-                <text key={i} className={`rotulo${r.fora ? ' rotulo-fora' : ''}${r.ativo ? ' rotulo-ativo' : ''}`}
-                  x={r.tx} y={r.ty + i * FONTE * 1.2 * px} fontSize={FONTE * px} strokeWidth={3.5 * px}>{t}</text>
-              ))}
-            </g>
+          {editor && numerados.map((l) => (
+            <line key={l.id} className="ligacao" strokeWidth={1.5 * px}
+              x1={l.x} y1={l.y} x2={dados.nos[l.no].x} y2={dados.nos[l.no].y} />
           ))}
 
-          {/* rota */}
-          {pontos && (
-            <>
-              <polyline className="rota-borda" points={pontos.map((p) => `${p.x},${p.y}`).join(' ')} />
-              <polyline className="rota" points={pontos.map((p) => `${p.x},${p.y}`).join(' ')} />
-            </>
-          )}
+          {/* rota: do número de origem até o número de destino */}
+          {pontos && (() => {
+            const tudo = [pOrigem, ...pontos, pDestino]
+            return (
+              <>
+                <polyline className="rota-borda" points={linha(tudo)} />
+                <polyline className="rota" points={linha(tudo)} />
+                <polyline className="rota-setas" points={linha(tudo)} />
+              </>
+            )
+          })()}
 
-          {/* destino: alfinete */}
-          {pontoDestino && (
-            <g className="sem-toque" transform={`translate(${pontoDestino.x} ${pontoDestino.y}) scale(${px})`}>
-              <path d="M0 0c-2-6-10-11-10-19a10 10 0 0 1 20 0c0 8-8 13-10 19z" fill="var(--destino)" stroke="#fff" strokeWidth="2" />
-              <circle cy="-19" r="3.6" fill="#fff" />
-            </g>
-          )}
+          {/* destino: número em vermelho, por cima da linha */}
+          {pDestino && <Marcador p={pDestino} px={px} cor="var(--destino)" texto={numeroDe(destino)} />}
 
-          {/* você está aqui */}
-          {pontoOrigem && (
-            <g className="sem-toque" transform={`translate(${pontoOrigem.x} ${pontoOrigem.y}) scale(${px})`}>
-              <circle r="20" fill="var(--voce)" fillOpacity=".15" className="pulso" />
-              <circle r="8" fill="var(--voce)" stroke="#fff" strokeWidth="3" />
-            </g>
-          )}
+          {/* você está aqui: número em azul, pulsando */}
+          {pOrigem && <Marcador p={pOrigem} px={px} cor="var(--voce)" texto={numeroDe(origem)} pulso />}
 
           {editor && Object.entries(dados.nos).map(([id, n]) => (
-            <text key={id} className="no-id" x={n.x + 2 * px} y={n.y - 2 * px} fontSize={10 * px}>{id}</text>
+            <g key={id}>
+              <circle cx={n.x} cy={n.y} r={3 * px} fill="#ffeb3b" />
+              <text className="no-id" x={n.x + 4 * px} y={n.y - 4 * px} fontSize={11 * px}>{id}</text>
+            </g>
           ))}
         </svg>
       )}
 
+      {/* nomes dos números */}
+      {rotulos.map((r) => (
+        <div key={r.id} className={`rotulo${r.pav ? ' rotulo-pav' : ''}`} style={{ left: r.x1, top: r.y1 }}>{r.texto}</div>
+      ))}
+
       {/* "Você está aqui" sempre legível */}
-      {vb && pontoOrigem && !destino && (() => {
-        const t = naTela(pontoOrigem)
-        return <div className="voce-aqui" style={{ left: t.x, top: t.y }}>Você está aqui</div>
+      {vb && pOrigem && (() => {
+        const t = naTela(pOrigem)
+        return (
+          <div className="voce-aqui" style={{ left: Math.min(Math.max(t.x, 80), tam.w - 80), top: t.y }}>
+            <span>Você está aqui</span>
+            <button aria-label="Desmarcar onde você está" onClick={aoLimparOrigem}>×</button>
+          </div>
+        )
       })()}
 
       {/* etiqueta do destino, com X para desmarcar */}
@@ -380,20 +294,10 @@ export default function Mapa({ foco, margem, pontos, origem, destino, destaque, 
         </div>
       )}
 
-      <div className="controles" style={{ top: (margem?.topo || 0) + 8 }}>
+      <div className="controles" style={{ bottom: (margem?.baixo || 0) + 12 }}>
         <button aria-label="Aproximar" onClick={() => zoomEm(tam.w / 2, tam.h / 2, 1 / 1.6)}>+</button>
         <button aria-label="Afastar" onClick={() => zoomEm(tam.w / 2, tam.h / 2, 1.6)}>−</button>
-        <button aria-label="Street View: tocar num ponto do mapa" aria-pressed={!!modoStreetView}
-          className={modoStreetView ? 'ativo' : ''} onClick={aoAlternarStreetView}>
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-            <circle cx="12" cy="5" r="2.6" fill="currentColor" />
-            <path d="M9 9.5h6l-.8 6.2h-1.4L12.5 21h-1l-.3-5.3H9.8z" fill="currentColor" />
-          </svg>
-        </button>
       </div>
-
-      <a className="credito" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer"
-        style={{ bottom: (margem?.baixo || 0) + 4 }}>{C.atribuicao}</a>
 
       {editor && clique && <div className="coordenadas">x: {clique.x}, y: {clique.y}</div>}
     </div>
