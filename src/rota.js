@@ -48,12 +48,14 @@ function menorCaminho(grafo, inicio, fim) {
   return { caminho, distancia: dist[fim] }
 }
 
-// Lugares de dentro do Pavilhão usam o ponto e a entrada do Pavilhão
+// Atrações de dentro do Pavilhão têm o nó da porta delas no corredor;
+// as que não têm (ex.: Expositores) usam a entrada do Pavilhão
 export function noDe(dados, local) {
-  return local.dentro ? dados.locais.find((l) => l.id === dados.pavilhao).no : local.no
+  return local.no || dados.locais.find((l) => l.id === dados.pavilhao).no
 }
+// (se a atração de dentro tiver x, y, usa o ponto dela dentro do Pavilhão)
 export function pontoDe(dados, local) {
-  const l = local.dentro ? dados.locais.find((p) => p.id === dados.pavilhao) : local
+  const l = local.dentro && local.x == null ? dados.locais.find((p) => p.id === dados.pavilhao) : local
   return { x: l.x, y: l.y }
 }
 

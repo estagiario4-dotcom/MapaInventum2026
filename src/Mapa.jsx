@@ -5,8 +5,51 @@ import { pontoDe } from './rota'
 const IMG = dados.imagem
 export const MAPA_INTEIRO = { x: 0, y: 0, w: IMG.largura, h: IMG.altura }
 const numerados = dados.locais.filter((l) => l.numero)
+// dentro do Pavilhão: com o mapa aproximado, o telhado fica "transparente" e mostra
+// os corredores e as atrações (no mesmo estilo dos pontos de fora)
+const PLANTA = dados.planta
+const ZOOM_PLANTA = 0.75 // unidades do mapa por pixel: abaixo disso abre o telhado
+const [PX, PY, PW, PH] = PLANTA.contorno
+const internos = dados.locais.filter((l) => l.dentro && l.x != null)
+
+// ícones das atrações (24x24, traço branco)
+const ICONES = {
+  pato: 'M6 14c0 3.3 2.7 5 6 5s6-1.7 6-5c0-1.8-1.2-3-2.6-3.5A4 4 0 1 0 8 9c0 .9.3 1.6.7 2.2C7.1 11.8 6 12.8 6 14zM13.5 8h.01M15.8 8.6l3.2.9-3.2.9',
+  foto: 'M4 8h3l2-3h6l2 3h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
+  empresa: 'M4 8h16v11H4zM9 8V5h6v3M4 13h16',
+  palco: 'M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM6 11a6 6 0 0 0 12 0M12 17v4M9 21h6',
+  banheiro: 'M7 5.5a1.5 1.5 0 1 0 0-.01M5 9h4l-.5 6H8v5H6v-5h-.5zM17 5.5a1.5 1.5 0 1 0 0-.01M15.5 9h3l1.5 6h-2v5h-2v-5h-2zM12 4v16',
+  drone: 'M9 10h6v4H9zM9 10L6.5 7.5M15 10l2.5-2.5M9 14l-2.5 2.5M15 14l2.5 2.5M3.5 6.5h6M14.5 6.5h6M3.5 17.5h6M14.5 17.5h6',
+  bola: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7.5l3.3 2.4-1.3 3.9h-4l-1.3-3.9zM12 3v4.5M15.3 9.9l4.9-1.4M8.7 9.9L3.8 8.5M14 13.8l2.8 4.3M10 13.8l-2.8 4.3',
+  foguete: 'M12 3c3 2 4.5 5 4.5 9l-2 3h-5l-2-3c0-4 1.5-7 4.5-9zM12 9.5h.01M9.5 15l-2 4 3-1M14.5 15l2 4-3-1',
+  fone: 'M4 15v-3a8 8 0 0 1 16 0v3M4 15h3v5H4zM17 15h3v5h-3z',
+  volante: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM3.3 11l6.7 1M20.7 11L14 12M12 14v7',
+  arvore: 'M12 3l6 8h-3l4 6H5l4-6H6zM12 17v4',
+  controle: 'M7 9h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5.4 1.8L14 15h-4l-1.6 1.8A3 3 0 0 1 3 15v-2a4 4 0 0 1 4-4zM8 11v4M6 13h4M15.5 12.5h.01M17.5 14.5h.01',
+  robo: 'M6 9h12v10H6zM12 5v4M12 4.5h.01M9.5 13h.01M14.5 13h.01M9 16.5h6M4 13v3M20 13v3',
+  cafe: 'M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h2a2 2 0 0 1 0 4h-2M8 3v3M11 3v3',
+  chip: 'M7 7h10v10H7zM10 10h4v4h-4zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4',
+  vr: 'M3 9h18v7h-6l-1.5-2h-3L9 16H3z',
+  planeta: 'M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM3 16c1.5 2 17-3.5 18-8.5',
+}
+
+// ponto de uma atração de dentro: bolinha igual às de fora, com ícone no lugar do número
+// (o ponto fica na parte de trás do espaço, para não cobrir o desenho 3D)
+const posPonto = (l) => l.ponto || l
+function Ponto({ l, px, cor = 'var(--numero)', pulso }) {
+  const p = posPonto(l)
+  return (
+    <g className="sem-toque" transform={`translate(${p.x} ${p.y}) scale(${px})`}>
+      {pulso && <circle r="22" fill={cor} fillOpacity=".3" className="pulso" />}
+      <circle r="15" fill={cor} stroke="#fff" strokeWidth="3" className="ponto-sombra" />
+      <path d={ICONES[l.icone]} transform="translate(-9 -9) scale(.75)" className="ponto-icone" />
+    </g>
+  )
+}
+
 const linha = (pts) => pts.map((p) => `${p.x},${p.y}`).join(' ')
-const numeroDe = (l) => (l.dentro ? dados.locais.find((p) => p.id === dados.pavilhao).numero : l.numero)
+const numeroDe = (l) => (l.dentro ? (l.x != null ? '★' : dados.locais.find((p) => p.id === dados.pavilhao).numero) : l.numero)
+const dentroDaPlanta = (p) => p.x >= PX && p.x <= PX + PW && p.y >= PY && p.y <= PY + PH
 
 // bolinha com o número, desenhada por cima do número da imagem (tamanho fixo na tela)
 function Marcador({ p, px, cor, texto, pulso }) {
@@ -152,8 +195,19 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     const ponto = { x: vb.x + (p.x / tam.w) * vb.w, y: vb.y + (p.y / tam.h) * vb.h }
     if (editor) setClique({ x: Math.round(ponto.x), y: Math.round(ponto.y) })
     // toque num nome escolhe esse lugar
-    const nome = rotulosNaTela.current.find((r) => p.x >= r.x1 && p.x <= r.x2 && p.y >= r.y1 && p.y <= r.y2)
+    const nome = rotulosNaTela.current.find((r) => r.id && p.x >= r.x1 && p.x <= r.x2 && p.y >= r.y1 && p.y <= r.y2)
     if (nome) return aoTocar(nome.id)
+    // com o telhado aberto, o toque dentro do Pavilhão escolhe a atração tocada
+    if (vb.w / tam.w <= ZOOM_PLANTA && dentroDaPlanta(ponto)) {
+      const k = vb.w / tam.w
+      let alvo = null
+      for (const l of internos) {
+        const d = Math.hypot(posPonto(l).x - ponto.x, posPonto(l).y - ponto.y)
+        if (d < 22 * k && (!alvo || d < alvo.d)) alvo = { l, d }
+      }
+      if (alvo) aoTocar(alvo.l.id)
+      return
+    }
     // toque perto de um número escolhe esse lugar
     const raio = Math.max(26, 26 * (vb.w / tam.w))
     let perto = null
@@ -166,6 +220,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
 
   // 1 pixel da tela em unidades do mapa
   const px = vb ? vb.w / tam.w : 1
+  const aberto = px <= ZOOM_PLANTA
   const naTela = (p) => ({ x: ((p.x - vb.x) / vb.w) * tam.w, y: ((p.y - vb.y) / vb.h) * tam.h })
 
   const pOrigem = origem ? pontoDe(dados, origem) : null
@@ -173,21 +228,22 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
   const pontos = rota?.pontos
 
   // etiqueta do destino (com X), presa em cima do número
+  const naVista = (t) => t.x > -10 && t.x < tam.w + 10 && t.y > -10 && t.y < tam.h - (margem?.baixo || 0) + 10
   let etiqueta = null
-  if (vb && pDestino) {
-    const t = naTela(pDestino)
+  if (vb && pDestino && naVista(naTela(destino.ponto || pDestino))) {
+    const t = naTela(destino.ponto || pDestino)
     etiqueta = { x: Math.min(Math.max(t.x, 110), tam.w - 110), y: Math.max(t.y, (margem?.topo || 0) + 60) }
   }
 
   // nomes curtos ao lado de cada número, sem cobrir outros números nem outros nomes
   const rotulos = []
   if (vb) {
-    const R = 16 / px + 2 // raio do número da imagem, em pixels da tela
-    const ocupado = numerados.map((l) => {
+    const R0 = 16 / px + 2 // raio do número da imagem, em pixels da tela
+    const ocupado = numerados.filter((l) => !(aberto && dentroDaPlanta(l))).map((l) => {
       const t = naTela(l)
-      return { x1: t.x - R, x2: t.x + R, y1: t.y - R, y2: t.y + R }
+      return { x1: t.x - R0, x2: t.x + R0, y1: t.y - R0, y2: t.y + R0 }
     })
-    if (pOrigem) {
+    if (pOrigem && naVista(naTela(pOrigem))) {
       const t = naTela(pOrigem)
       const x = Math.min(Math.max(t.x, 80), tam.w - 80)
       ocupado.push({ x1: x - 75, x2: x + 75, y1: t.y + 28, y2: t.y + 64 })
@@ -198,13 +254,52 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     }
     const livre = (r) => r.x1 >= 4 && r.x2 <= tam.w - 4 && r.y1 >= 4 && r.y2 <= tam.h - (margem?.baixo || 0) - 4
       && !ocupado.some((o) => r.x1 < o.x2 && r.x2 > o.x1 && r.y1 < o.y2 && r.y2 > o.y1)
-    const ordem = [...numerados].sort((a, b) => (origem?.id === b.id) - (origem?.id === a.id) || a.numero - b.numero)
+    if (aberto) {
+      // nomes das atrações ao lado do ponto (mesmo estilo dos de fora)
+      for (const l of internos) {
+        const t = naTela(posPonto(l))
+        ocupado.push({ x1: t.x - 16, x2: t.x + 16, y1: t.y - 16, y2: t.y + 16 })
+      }
+      const e = naTela(PLANTA.entrada)
+      const el = naTela(PLANTA.entradaLateral)
+      for (const r of [
+        { x1: e.x - 30, x2: e.x + 30, y1: e.y + 4, y2: e.y + 24 },
+        { x1: el.x - 66, x2: el.x - 6, y1: el.y - 10, y2: el.y + 10 },
+      ]) {
+        const entrada = { ...r, id: null, texto: 'Entrada', classe: ' rotulo-entrada' }
+        ocupado.push(entrada)
+        rotulos.push(entrada)
+      }
+      const ordemDentro = [...internos].sort((a, b) => (b.id === destino?.id || b.id === origem?.id) - (a.id === destino?.id || a.id === origem?.id))
+      for (const l of ordemDentro) {
+        if (l.id === destino?.id) continue // o destino já tem a etiqueta com o nome
+        const t = naTela(posPonto(l))
+        const w = l.rotulo.length * 6.4 + 14
+        const h = 20
+        const r = [
+          { x1: t.x + 18, y1: t.y - h / 2 },
+          { x1: t.x - w / 2, y1: t.y + 17 },
+          { x1: t.x - 18 - w, y1: t.y - h / 2 },
+          { x1: t.x - w / 2, y1: t.y - 17 - h },
+        ].map((o) => ({ ...o, x2: o.x1 + w, y2: o.y1 + h })).find(livre)
+        if (!r) continue
+        ocupado.push(r)
+        rotulos.push({ ...r, id: l.id, texto: l.rotulo, classe: l.id === origem?.id ? ' rotulo-origem' : '' })
+      }
+      // os nomes de fora não entram em cima do Pavilhão aberto
+      const a = naTela({ x: PX, y: PY })
+      const b = naTela({ x: PX + PW, y: PY + PH })
+      ocupado.push({ x1: a.x, x2: b.x, y1: a.y, y2: b.y + 24 })
+    }
+    const ordem = numerados.filter((l) => !(aberto && dentroDaPlanta(l)))
+      .sort((a, b) => (origem?.id === b.id) - (origem?.id === a.id) || a.numero - b.numero)
     for (const l of ordem) {
       if (destino && l.id === destino.id) continue // o destino já tem a etiqueta com o nome
       const t = naTela(l)
       if (t.x < -100 || t.x > tam.w + 100 || t.y < -40 || t.y > tam.h + 40) continue
       const w = l.rotulo.length * 6.4 + 14
       const h = 20
+      const R = R0
       const opcoes = [
         { x1: t.x + R + 2, y1: t.y - h / 2 }, // à direita
         { x1: t.x - w / 2, y1: t.y + R + 1 }, // embaixo
@@ -214,7 +309,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       const r = opcoes.find(livre)
       if (!r) continue
       ocupado.push(r)
-      rotulos.push({ ...r, id: l.id, texto: l.rotulo, pav: l.id === dados.pavilhao })
+      rotulos.push({ ...r, id: l.id, texto: l.rotulo, classe: l.id === dados.pavilhao ? ' rotulo-pav' : '' })
     }
   }
   rotulosNaTela.current = rotulos
@@ -243,6 +338,10 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
               x1={l.x} y1={l.y} x2={dados.nos[l.no].x} y2={dados.nos[l.no].y} />
           ))}
 
+          {/* telhado aberto: o Pavilhão por dentro, em 3D (aparece ao aproximar) */}
+          <image href={PLANTA.imagem} x={PX} y={PY} width={PW} height={PH} preserveAspectRatio="none"
+            className={`pavilhao-dentro${aberto ? ' visivel' : ''}`} />
+
           {/* rota: do número de origem até o número de destino */}
           {pontos && (() => {
             const tudo = [pOrigem, ...pontos, pDestino]
@@ -255,11 +354,18 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
             )
           })()}
 
+          {/* atrações de dentro do Pavilhão */}
+          {aberto && internos.filter((l) => l.id !== destino?.id && l.id !== origem?.id).map((l) => <Ponto key={l.id} l={l} px={px} />)}
+
           {/* destino: número em vermelho, por cima da linha */}
-          {pDestino && <Marcador p={pDestino} px={px} cor="var(--destino)" texto={numeroDe(destino)} />}
+          {pDestino && (destino.icone
+            ? <Ponto l={destino} px={px} cor="var(--destino)" />
+            : <Marcador p={pDestino} px={px} cor="var(--destino)" texto={numeroDe(destino)} />)}
 
           {/* você está aqui: número em azul, pulsando */}
-          {pOrigem && <Marcador p={pOrigem} px={px} cor="var(--voce)" texto={numeroDe(origem)} pulso />}
+          {pOrigem && (origem.icone
+            ? <Ponto l={origem} px={px} cor="var(--voce)" pulso />
+            : <Marcador p={pOrigem} px={px} cor="var(--voce)" texto={numeroDe(origem)} pulso />)}
 
           {editor && Object.entries(dados.nos).map(([id, n]) => (
             <g key={id}>
@@ -271,12 +377,12 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       )}
 
       {/* nomes dos números */}
-      {rotulos.map((r) => (
-        <div key={r.id} className={`rotulo${r.pav ? ' rotulo-pav' : ''}`} style={{ left: r.x1, top: r.y1 }}>{r.texto}</div>
+      {rotulos.map((r, i) => (
+        <div key={i} className={`rotulo${r.classe || ''}`} style={{ left: r.x1, top: r.y1 }}>{r.texto}</div>
       ))}
 
       {/* "Você está aqui" sempre legível */}
-      {vb && pOrigem && (() => {
+      {vb && pOrigem && naVista(naTela(pOrigem)) && (() => {
         const t = naTela(pOrigem)
         return (
           <div className="voce-aqui" style={{ left: Math.min(Math.max(t.x, 80), tam.w - 80), top: t.y }}>

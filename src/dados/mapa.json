@@ -172,77 +172,226 @@
   {
    "id": "pavilhao-pato-holografico",
    "nome": "Pato Holográfico",
-   "dentro": true
+   "rotulo": "Pato Holográfico",
+   "icone": "pato",
+   "dentro": true,
+   "x": 906.1,
+   "y": 289.8,
+   "no": "pv2",
+   "ponto": {
+    "x": 906.0,
+    "y": 277.7
+   }
   },
   {
    "id": "pavilhao-foto-ia",
    "nome": "Foto IA",
-   "dentro": true
+   "rotulo": "Foto IA",
+   "icone": "foto",
+   "dentro": true,
+   "x": 906.5,
+   "y": 322.0,
+   "no": "pv4",
+   "ponto": {
+    "x": 906.4,
+    "y": 312.1
+   }
   },
   {
    "id": "pavilhao-akiyama",
    "nome": "Akiyama",
-   "dentro": true
+   "rotulo": "Akiyama",
+   "icone": "empresa",
+   "dentro": true,
+   "x": 905.5,
+   "y": 351.6,
+   "no": "pv6",
+   "ponto": {
+    "x": 905.5,
+    "y": 345.5
+   }
   },
   {
    "id": "pavilhao-palco-startup",
    "nome": "Palco Startup",
-   "dentro": true
+   "rotulo": "Palco Startup",
+   "icone": "palco",
+   "dentro": true,
+   "x": 950.3,
+   "y": 380.4,
+   "no": "pv7",
+   "ponto": {
+    "x": 950.0,
+    "y": 371.5
+   }
   },
   {
    "id": "pavilhao-banheiros",
    "nome": "Banheiros",
-   "dentro": true
+   "rotulo": "Banheiros",
+   "icone": "banheiro",
+   "dentro": true,
+   "x": 1029.5,
+   "y": 381.2,
+   "no": "pv11",
+   "ponto": {
+    "x": 1029.0,
+    "y": 373.2
+   }
   },
   {
    "id": "pavilhao-drone-soccer",
    "nome": "Drone Soccer",
-   "dentro": true
+   "rotulo": "Drone Soccer",
+   "icone": "bola",
+   "dentro": true,
+   "x": 935.6,
+   "y": 288.3,
+   "no": "pv21",
+   "ponto": {
+    "x": 935.3,
+    "y": 274.9
+   }
+  },
+  {
+   "id": "pavilhao-drone-racer",
+   "nome": "Drone Racer",
+   "rotulo": "Drone Racer",
+   "icone": "drone",
+   "dentro": true,
+   "x": 970.0,
+   "y": 320.0,
+   "no": "pv24",
+   "ponto": {
+    "x": 969.6,
+    "y": 307.1
+   }
   },
   {
    "id": "pavilhao-espaco-startups",
    "nome": "Espaço Startups",
-   "dentro": true
+   "rotulo": "Espaço Startups",
+   "icone": "foguete",
+   "dentro": true,
+   "x": 971.0,
+   "y": 349.7,
+   "no": "pv9",
+   "ponto": {
+    "x": 970.7,
+    "y": 340.8
+   }
   },
   {
    "id": "pavilhao-podcast",
    "nome": "Podcast",
-   "dentro": true
+   "rotulo": "Podcast",
+   "icone": "fone",
+   "dentro": true,
+   "x": 1091.9,
+   "y": 317.5,
+   "no": "pv31",
+   "ponto": {
+    "x": 1091.2,
+    "y": 310.1
+   }
   },
   {
    "id": "pavilhao-simuladores",
    "nome": "Simuladores",
-   "dentro": true
+   "rotulo": "Simuladores",
+   "icone": "volante",
+   "dentro": true,
+   "x": 1105.2,
+   "y": 287.6,
+   "no": "pv32",
+   "ponto": {
+    "x": 1104.2,
+    "y": 277.2
+   }
   },
   {
    "id": "pavilhao-arvore-de-led",
    "nome": "Árvore de LED",
-   "dentro": true
+   "rotulo": "Árvore de LED",
+   "icone": "arvore",
+   "dentro": true,
+   "x": 1121.3,
+   "y": 322.0,
+   "no": "pv33",
+   "ponto": {
+    "x": 1120.0,
+    "y": 309.1
+   }
   },
   {
    "id": "pavilhao-museu-game",
    "nome": "Museu Game",
-   "dentro": true
+   "rotulo": "Museu Game",
+   "icone": "controle",
+   "dentro": true,
+   "x": 1185.7,
+   "y": 292.7,
+   "no": "pv37",
+   "ponto": {
+    "x": 1183.7,
+    "y": 277.7
+   }
   },
   {
    "id": "pavilhao-arena-robotica",
    "nome": "Arena Robótica",
-   "dentro": true
+   "rotulo": "Arena Robótica",
+   "icone": "robo",
+   "dentro": true,
+   "x": 1242.8,
+   "y": 338.8,
+   "no": "pv39",
+   "ponto": {
+    "x": 1240.5,
+    "y": 324.2
+   }
   },
   {
    "id": "pavilhao-area-de-convivencia",
    "nome": "Área de Convivência",
-   "dentro": true
+   "rotulo": "Área de Convivência",
+   "icone": "cafe",
+   "dentro": true,
+   "x": 1097.8,
+   "y": 381.9,
+   "no": "pv14",
+   "ponto": {
+    "x": 1096.9,
+    "y": 372.6
+   }
   },
   {
    "id": "pavilhao-espaco-patotech",
    "nome": "Espaço Patotech",
-   "dentro": true
+   "rotulo": "Espaço Patotech",
+   "icone": "chip",
+   "dentro": true,
+   "x": 1240.6,
+   "y": 380.9,
+   "no": "pv17",
+   "ponto": {
+    "x": 1239.4,
+    "y": 372.6
+   }
   },
   {
    "id": "pavilhao-sala-de-imersao",
    "nome": "Sala de Imersão",
-   "dentro": true
+   "rotulo": "Sala de Imersão",
+   "icone": "vr",
+   "dentro": true,
+   "x": 935.0,
+   "y": 323.9,
+   "no": "pv23",
+   "ponto": {
+    "x": 934.8,
+    "y": 315.1
+   }
   },
   {
    "id": "pavilhao-expositores",
@@ -252,7 +401,16 @@
   {
    "id": "pavilhao-planetario",
    "nome": "Planetário",
-   "dentro": true
+   "rotulo": "Planetário",
+   "icone": "planeta",
+   "dentro": true,
+   "x": 1170.8,
+   "y": 343.4,
+   "no": "pv16",
+   "ponto": {
+    "x": 1169.4,
+    "y": 332.3
+   }
   }
  ],
  "nos": {
@@ -451,6 +609,170 @@
   "lago": {
    "x": 1005,
    "y": 600
+  },
+  "f4": {
+   "x": 866,
+   "y": 337
+  },
+  "pv1": {
+   "x": 888.0,
+   "y": 275.2
+  },
+  "pv2": {
+   "x": 888.0,
+   "y": 290.0
+  },
+  "pv3": {
+   "x": 888.1,
+   "y": 319.1
+  },
+  "pv4": {
+   "x": 888.1,
+   "y": 322.1
+  },
+  "pv5": {
+   "x": 888.2,
+   "y": 365.0
+  },
+  "pv6": {
+   "x": 905.5,
+   "y": 365.0
+  },
+  "pv7": {
+   "x": 950.3,
+   "y": 365.0
+  },
+  "pv8": {
+   "x": 953.6,
+   "y": 365.0
+  },
+  "pv9": {
+   "x": 971.0,
+   "y": 365.0
+  },
+  "pv10": {
+   "x": 991.2,
+   "y": 365.0
+  },
+  "pv11": {
+   "x": 1029.5,
+   "y": 365.0
+  },
+  "pv12": {
+   "x": 1085.9,
+   "y": 365.0
+  },
+  "pv13": {
+   "x": 1097.1,
+   "y": 365.0
+  },
+  "pv14": {
+   "x": 1097.8,
+   "y": 365.0
+  },
+  "pv15": {
+   "x": 1148.8,
+   "y": 365.0
+  },
+  "pv16": {
+   "x": 1170.8,
+   "y": 365.0
+  },
+  "pv17": {
+   "x": 1240.7,
+   "y": 365.0
+  },
+  "pv18": {
+   "x": 1269.8,
+   "y": 365.0
+  },
+  "pv19": {
+   "x": 884.0,
+   "y": 319.1
+  },
+  "pv20": {
+   "x": 950.8,
+   "y": 272.3
+  },
+  "pv21": {
+   "x": 951.3,
+   "y": 288.0
+  },
+  "pv22": {
+   "x": 951.7,
+   "y": 302.6
+  },
+  "pv23": {
+   "x": 952.3,
+   "y": 323.4
+  },
+  "pv24": {
+   "x": 970.1,
+   "y": 302.6
+  },
+  "pv25": {
+   "x": 988.3,
+   "y": 302.6
+  },
+  "pv26": {
+   "x": 1080.4,
+   "y": 302.6
+  },
+  "pv27": {
+   "x": 989.7,
+   "y": 332.0
+  },
+  "pv28": {
+   "x": 1083.0,
+   "y": 332.0
+  },
+  "pv29": {
+   "x": 1077.7,
+   "y": 272.3
+  },
+  "pv30": {
+   "x": 1080.5,
+   "y": 303.6
+  },
+  "pv31": {
+   "x": 1081.8,
+   "y": 318.5
+  },
+  "pv32": {
+   "x": 1105.2,
+   "y": 303.6
+  },
+  "pv33": {
+   "x": 1121.3,
+   "y": 303.6
+  },
+  "pv34": {
+   "x": 1141.7,
+   "y": 303.6
+  },
+  "pv35": {
+   "x": 1138.3,
+   "y": 273.3
+  },
+  "pv36": {
+   "x": 1143.1,
+   "y": 315.5
+  },
+  "pv37": {
+   "x": 1185.7,
+   "y": 315.5
+  },
+  "pv38": {
+   "x": 1261.5,
+   "y": 315.5
+  },
+  "pv39": {
+   "x": 1264.8,
+   "y": 335.2
+  },
+  "pv40": {
+   "x": 1100.2,
+   "y": 398.5
   }
  },
  "caminhos": [
@@ -661,6 +983,207 @@
   [
    "k2",
    "lago"
+  ],
+  [
+   "f3",
+   "f4"
+  ],
+  [
+   "pv1",
+   "pv2"
+  ],
+  [
+   "pv10",
+   "pv11"
+  ],
+  [
+   "pv10",
+   "pv27"
+  ],
+  [
+   "pv10",
+   "pv9"
+  ],
+  [
+   "pv11",
+   "pv12"
+  ],
+  [
+   "pv12",
+   "pv13"
+  ],
+  [
+   "pv12",
+   "pv28"
+  ],
+  [
+   "pv13",
+   "pv14"
+  ],
+  [
+   "pv13",
+   "pv40"
+  ],
+  [
+   "pv14",
+   "pv15"
+  ],
+  [
+   "pv15",
+   "pv16"
+  ],
+  [
+   "pv15",
+   "pv36"
+  ],
+  [
+   "pv16",
+   "pv17"
+  ],
+  [
+   "pv17",
+   "pv18"
+  ],
+  [
+   "pv18",
+   "pv39"
+  ],
+  [
+   "pv19",
+   "pv3"
+  ],
+  [
+   "pv2",
+   "pv3"
+  ],
+  [
+   "pv20",
+   "pv21"
+  ],
+  [
+   "pv21",
+   "pv22"
+  ],
+  [
+   "pv22",
+   "pv23"
+  ],
+  [
+   "pv22",
+   "pv24"
+  ],
+  [
+   "pv23",
+   "pv8"
+  ],
+  [
+   "pv24",
+   "pv25"
+  ],
+  [
+   "pv25",
+   "pv26"
+  ],
+  [
+   "pv25",
+   "pv27"
+  ],
+  [
+   "pv26",
+   "pv29"
+  ],
+  [
+   "pv26",
+   "pv30"
+  ],
+  [
+   "pv27",
+   "pv28"
+  ],
+  [
+   "pv28",
+   "pv31"
+  ],
+  [
+   "pv3",
+   "pv4"
+  ],
+  [
+   "pv30",
+   "pv31"
+  ],
+  [
+   "pv30",
+   "pv32"
+  ],
+  [
+   "pv32",
+   "pv33"
+  ],
+  [
+   "pv33",
+   "pv34"
+  ],
+  [
+   "pv35",
+   "pv36"
+  ],
+  [
+   "pv36",
+   "pv37"
+  ],
+  [
+   "pv37",
+   "pv38"
+  ],
+  [
+   "pv38",
+   "pv39"
+  ],
+  [
+   "pv4",
+   "pv5"
+  ],
+  [
+   "pv5",
+   "pv6"
+  ],
+  [
+   "pv6",
+   "pv7"
+  ],
+  [
+   "pv7",
+   "pv8"
+  ],
+  [
+   "pv8",
+   "pv9"
+  ],
+  [
+   "entrada",
+   "pv40"
+  ],
+  [
+   "f4",
+   "pv19"
   ]
- ]
+ ],
+ "planta": {
+  "imagem": "/pavilhao-dentro.webp",
+  "contorno": [
+   884,
+   271,
+   404,
+   128
+  ],
+  "entrada": {
+   "x": 1100.2,
+   "y": 398.5
+  },
+  "entradaLateral": {
+   "x": 884.0,
+   "y": 319.1
+  }
+ }
 }
