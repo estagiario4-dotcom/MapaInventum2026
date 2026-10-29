@@ -50,7 +50,28 @@ node scripts/testar-rotas.mjs
 
 Testa todas as combinações de origem e destino e avisa se algum lugar ficou fora da cerca, se alguma rota falhou ou se alguma rota sai do parque.
 
-## Deploy no Cloud Run
+## Deploy na Vercel
+
+O projeto já tem o `vercel.json` (build com `npm run build`, publica a pasta `dist`).
+
+**Pelo GitHub (recomendado):**
+
+1. Suba o projeto para o GitHub (`git add . && git commit -m "deploy vercel" && git push`).
+2. Em vercel.com, entre com a conta do GitHub e clique em **Add New → Project**.
+3. Escolha o repositório `Mapa_Inventum` e clique em **Deploy** (as configurações já vêm do `vercel.json`).
+4. Pronto: a Vercel mostra o link (`https://...vercel.app`). Cada `git push` na `main` atualiza o site sozinho.
+
+**Pelo terminal (sem GitHub):**
+
+```bash
+npm i -g vercel
+vercel          # primeira vez: faz login e cria o projeto
+vercel --prod   # publica a versão final
+```
+
+**Domínio próprio:** em Project → Settings → Domains, adicione o endereço (ex.: `mapa.patobranco.pr.gov.br`) e passe para a TI o registro DNS que a Vercel mostrar.
+
+## Alternativa: Cloud Run
 
 ```bash
 gcloud run deploy mapa-inventum \
@@ -68,7 +89,7 @@ gcloud run services update mapa-inventum --region southamerica-east1 --min-insta
 
 ## QR codes
 
-Depois do deploy, com a URL que o Cloud Run mostrou:
+Depois do deploy, com o link definitivo do site (o mesmo que vai ficar no ar durante o evento):
 
 ```bash
 npm run qrcodes -- https://mapa-inventum-xxxxx.run.app
