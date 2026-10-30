@@ -11,8 +11,8 @@
    "numero": 1,
    "id": "espaco-astronomia",
    "nome": "Espaço Astronomia",
-   "rotulo": "Astronomia",
-   "x": 61,
+   "rotulo": "Espaço Astronomia",
+   "x": 60,
    "y": 386,
    "no": "a1"
   },
@@ -20,9 +20,9 @@
    "numero": 2,
    "id": "espaco-inovacao",
    "nome": "Espaço Inovação",
-   "rotulo": "Inovação",
-   "x": 192,
-   "y": 330,
+   "rotulo": "Espaço Inovação",
+   "x": 191,
+   "y": 331,
    "no": "t2"
   },
   {
@@ -30,144 +30,162 @@
    "id": "espaco-da-descoberta",
    "nome": "Espaço da Descoberta, Desafio e IA",
    "rotulo": "Descoberta, Desafio e IA",
-   "x": 287,
+   "x": 286,
    "y": 317,
    "no": "t4"
   },
   {
    "numero": 4,
-   "id": "feira-de-artesanato",
-   "nome": "Feira de Artesanato",
-   "rotulo": "Artesanato",
-   "x": 358,
-   "y": 318,
-   "no": "t5"
+   "id": "carreta-senac",
+   "nome": "Carreta Senac",
+   "rotulo": "Carreta Senac",
+   "x": 306,
+   "y": 283,
+   "no": "t4b"
   },
   {
    "numero": 5,
-   "id": "banheiros",
-   "nome": "Banheiros",
-   "rotulo": "Banheiros",
-   "x": 466,
-   "y": 282,
-   "no": "t7"
+   "id": "feira-de-artesanato",
+   "nome": "Feira de Artesanato",
+   "rotulo": "Feira de Artesanato",
+   "x": 358,
+   "y": 317,
+   "no": "t5"
   },
   {
    "numero": 6,
-   "id": "pebolim-humano",
-   "nome": "Pebolim Humano",
-   "rotulo": "Pebolim Humano",
-   "x": 466,
-   "y": 421,
-   "no": "m3"
+   "id": "banheiros",
+   "nome": "Banheiros",
+   "rotulo": "Banheiros",
+   "x": 467,
+   "y": 283,
+   "no": "t7"
   },
   {
    "numero": 7,
-   "id": "espaco-tea",
-   "nome": "Espaço TEA",
-   "rotulo": "Espaço TEA",
-   "x": 528,
-   "y": 290,
-   "no": "t8"
+   "id": "pebolim-humano",
+   "nome": "Pebolim Humano",
+   "rotulo": "Pebolim Humano",
+   "x": 465,
+   "y": 422,
+   "no": "m3"
   },
   {
    "numero": 8,
-   "id": "espaco-museu-puc",
-   "nome": "Espaço Museu PUC",
-   "rotulo": "Museu PUC",
-   "x": 528,
-   "y": 412,
-   "no": "j2"
+   "id": "espaco-tea",
+   "nome": "Espaço TEA",
+   "rotulo": "Espaço TEA",
+   "x": 527,
+   "y": 289,
+   "no": "t8"
   },
   {
    "numero": 9,
+   "id": "espaco-museu-puc",
+   "nome": "Espaço Museu PUC",
+   "rotulo": "Museu PUC",
+   "x": 527,
+   "y": 413,
+   "no": "j2"
+  },
+  {
+   "numero": 10,
    "id": "espaco-natureza-gigante",
    "nome": "Espaço Natureza Gigante",
    "rotulo": "Natureza Gigante",
    "x": 602,
-   "y": 357,
+   "y": 358,
    "no": "s1"
   },
   {
-   "numero": 10,
+   "numero": 11,
    "id": "food-truck",
    "nome": "Food Truck",
    "rotulo": "Food Truck",
-   "x": 617,
-   "y": 302,
+   "x": 616,
+   "y": 303,
    "no": "f1"
   },
   {
-   "numero": 11,
+   "numero": 12,
    "id": "carreta-sesi",
    "nome": "Carreta SESI",
    "rotulo": "Carreta SESI",
-   "x": 645,
+   "x": 642,
    "y": 422,
    "no": "s2"
   },
   {
-   "numero": 12,
+   "numero": 13,
    "id": "expositores",
    "nome": "Expositores",
    "rotulo": "Expositores",
-   "x": 714,
-   "y": 366,
+   "x": 713,
+   "y": 367,
    "no": "s3"
   },
   {
-   "numero": 13,
+   "numero": 14,
    "id": "espaco-patum",
    "nome": "Espaço Patum",
    "rotulo": "Espaço Patum",
-   "x": 719,
+   "x": 718,
    "y": 427,
-   "no": "s4"
+   "no": "s3"
   },
   {
-   "numero": 14,
-   "id": "caminhao-fiep",
-   "nome": "Caminhão FIEP",
-   "rotulo": "Caminhão FIEP",
-   "x": 771,
+   "numero": 15,
+   "id": "espaco-idr",
+   "nome": "Espaço IDR",
+   "rotulo": "Espaço IDR",
+   "x": 770,
    "y": 296,
    "no": "f3"
   },
   {
-   "numero": 15,
-   "id": "nautimodelismo",
-   "nome": "Nautimodelismo",
-   "rotulo": "Nautimodelismo",
-   "x": 1041,
-   "y": 670,
-   "no": "lago"
+   "numero": 16,
+   "id": "praca-sustentabilidade",
+   "nome": "Praça Sustentabilidade",
+   "rotulo": "Praça Sustentabilidade",
+   "x": 803,
+   "y": 368,
+   "no": "s45"
   },
   {
-   "numero": 16,
+   "numero": 17,
    "id": "corrida-maluca",
    "nome": "Corrida Maluca",
    "rotulo": "Corrida Maluca",
-   "x": 1115,
+   "x": 1114,
    "y": 545,
    "no": "g8"
   },
   {
-   "numero": 17,
+   "numero": 18,
+   "id": "nautimodelismo",
+   "nome": "Nautimodelismo",
+   "rotulo": "Nautimodelismo",
+   "x": 1040,
+   "y": 670,
+   "no": "lago"
+  },
+  {
+   "numero": 19,
    "id": "auditorio-cultura",
    "nome": "Auditório Cultura",
    "rotulo": "Auditório Cultura",
-   "x": 1421,
-   "y": 353,
+   "x": 1419,
+   "y": 352,
    "no": "auditorio"
   },
   {
-   "numero": 18,
+   "numero": 20,
    "id": "exposicao-interna",
    "nome": "Exposição Interna (Pavilhão)",
-   "rotulo": "Pavilhão · Atrações",
+   "rotulo": "Exposição Interna",
    "x": 1088,
    "y": 313,
-   "no": "entrada"
+   "no": "f4"
   },
   {
    "id": "pavilhao-pato-holografico",
@@ -773,6 +791,26 @@
   "pv40": {
    "x": 1100.2,
    "y": 398.5
+  },
+  "t4b": {
+   "x": 310,
+   "y": 296
+  },
+  "s45": {
+   "x": 805,
+   "y": 405
+  },
+  "pvd": {
+   "x": 1272.5,
+   "y": 315.5
+  },
+  "anexo": {
+   "x": 1305,
+   "y": 330
+  },
+  "anexo-porta": {
+   "x": 1322,
+   "y": 436
   }
  },
  "caminhos": [
@@ -787,10 +825,6 @@
   [
    "t3",
    "t4"
-  ],
-  [
-   "t4",
-   "t5"
   ],
   [
    "t5",
@@ -881,10 +915,6 @@
    "s4"
   ],
   [
-   "s4",
-   "s5"
-  ],
-  [
    "s5",
    "s6"
   ],
@@ -894,19 +924,23 @@
   ],
   [
    "p0",
-   "p1"
+   "p1",
+   4
   ],
   [
    "p1",
-   "entrada"
+   "entrada",
+   4
   ],
   [
    "entrada",
-   "p2"
+   "p2",
+   4
   ],
   [
    "p2",
-   "p3"
+   "p3",
+   4
   ],
   [
    "p3",
@@ -946,19 +980,23 @@
   ],
   [
    "g6",
-   "g7"
+   "g7",
+   2.5
   ],
   [
    "g7",
-   "g8"
+   "g8",
+   2.5
   ],
   [
    "g8",
-   "g9"
+   "g9",
+   2.5
   ],
   [
    "g9",
-   "g10"
+   "g10",
+   2.5
   ],
   [
    "g10",
@@ -1161,12 +1199,48 @@
    "pv9"
   ],
   [
-   "entrada",
-   "pv40"
+   "f4",
+   "pv19"
+  ],
+  [
+   "t4",
+   "t4b"
+  ],
+  [
+   "t4b",
+   "t5"
+  ],
+  [
+   "s4",
+   "s45"
+  ],
+  [
+   "s45",
+   "s5"
+  ],
+  [
+   "pv38",
+   "pvd"
+  ],
+  [
+   "pvd",
+   "anexo"
+  ],
+  [
+   "anexo",
+   "anexo-porta"
+  ],
+  [
+   "anexo-porta",
+   "p3"
+  ],
+  [
+   "anexo-porta",
+   "p4"
   ],
   [
    "f4",
-   "pv19"
+   "s5"
   ]
  ],
  "planta": {
@@ -1177,13 +1251,13 @@
    404,
    128
   ],
-  "entrada": {
-   "x": 1100.2,
-   "y": 398.5
-  },
   "entradaLateral": {
    "x": 884.0,
    "y": 319.1
+  },
+  "entradaDireita": {
+   "x": 1272.5,
+   "y": 315.5
   }
  }
 }

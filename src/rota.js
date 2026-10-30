@@ -3,10 +3,12 @@ export function montarGrafo(dados) {
   const vizinhos = {}
   for (const id in dados.nos) vizinhos[id] = []
 
-  for (const [a, b] of dados.caminhos) {
+  // o 3º valor do caminho (opcional) deixa o trecho "mais caro" para a rota evitar
+  // (ex.: a calçada da frente do Pavilhão, para a rota passar por dentro dele)
+  for (const [a, b, custo = 1] of dados.caminhos) {
     const na = dados.nos[a]
     const nb = dados.nos[b]
-    const peso = Math.hypot(na.x - nb.x, na.y - nb.y)
+    const peso = Math.hypot(na.x - nb.x, na.y - nb.y) * custo
     vizinhos[a].push({ id: b, peso })
     vizinhos[b].push({ id: a, peso })
   }
@@ -74,5 +76,9 @@ export function calcularRota(dados, grafo, origem, destino) {
     }
   }
 
-  return { destino, pontos, referencias, metros: r.distancia * dados.metrosPorUnidade }
+  // distância de verdade (sem o custo extra dos trechos evitados)
+  let d = 0
+  for (let i = 1; i < pontos.length; i++) d += Math.hypot(pontos[i].x - pontos[i - 1].x, pontos[i].y - pontos[i - 1].y)
+  const pelaPavilhao = !origem.dentro && !destino.dentro && r.caminho.some((id) => id.startsWith('pv'))
+  return { destino, pontos, referencias, pelaPavilhao, metros: d * dados.metrosPorUnidade }
 }

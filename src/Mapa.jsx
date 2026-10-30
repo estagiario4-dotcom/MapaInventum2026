@@ -83,7 +83,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     const maxW = Math.min(IMG.largura, IMG.altura * (tam.w / tam.h))
     const cx = v.x + v.w / 2
     const cy = v.y + v.h / 2
-    const w = Math.min(Math.max(v.w, 120), maxW)
+    // zoom máximo: no máximo 5 pixels de tela por unidade (a imagem não fica borrada)
+    const w = Math.min(Math.max(v.w, 120, tam.w / 5), maxW)
     const h = w * (tam.h / tam.w)
     const k = w / tam.w
     const topo = (margem?.topo || 0) * k
@@ -97,7 +98,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
   // enquadra uma caixa do mapa na parte livre da tela (acima do painel)
   // "manter": ponto que precisa aparecer quando a caixa não cabe na tela (ex.: onde a pessoa está)
   // "mover": só arrasta o mapa até a caixa, sem mudar o zoom
-  function enquadrar(b, manter, mover) {
+  // soManter: não mexe no zoom nem no centro; só arrasta o mínimo para "manter" aparecer
+  function enquadrar(b, manter, mover, soManter) {
     const topo = margem?.topo || 0
     const baixo = margem?.baixo || 0
     const esquerda = margem?.esquerda || 0
@@ -105,9 +107,9 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     const livreW = Math.max(tam.w - esquerda - 24, 120)
     // escala (unidades do mapa por pixel), sem passar do zoom máximo e do mínimo
     const maxEscala = Math.min(IMG.largura, IMG.altura * (tam.w / tam.h)) / tam.w
-    const escala = mover && vb ? vb.w / tam.w
-      : Math.min(Math.max(Math.max(b.w / livreW, b.h / livreH) * 1.08, 120 / tam.w), maxEscala)
-    let v = {
+    const escala = (mover || soManter) && vb ? vb.w / tam.w
+      : Math.min(Math.max(Math.max(b.w / livreW, b.h / livreH) * 1.08, Math.max(120, tam.w / 5) / tam.w), maxEscala)
+    let v = soManter && vb ? { ...vb } : {
       x: b.x + b.w / 2 - (esquerda + 12 + livreW / 2) * escala,
       y: b.y + b.h / 2 - (topo + livreH / 2) * escala,
       w: tam.w * escala,
@@ -124,20 +126,34 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       v = { ...v, x: v.x + dx, y: v.y + dy }
     }
     // não mostra faixa vazia embaixo da imagem se não precisar
-    const yMax = Math.max(IMG.altura - v.h, b.y + b.h - (v.h - baixo * escala))
-    v = limitar({ ...v, y: Math.min(v.y, yMax) })
+    if (!soManter) {
+      const yMax = Math.max(IMG.altura - v.h, b.y + b.h - (v.h - baixo * escala))
+      v = { ...v, y: Math.min(v.y, yMax) }
+    }
+    v = limitar(v)
     setVb(v)
   }
 
   useEffect(() => {
-    if (tam.w && foco) enquadrar(foco.caixa, foco.manter, foco.mover)
+    if (tam.w && foco) enquadrar(foco.caixa, foco.manter, foco.mover, foco.soManter)
     // refaz quando o painel muda de tamanho, para a rota não ficar escondida atrás dele
   }, [foco, tam.w, tam.h, margem?.baixo, margem?.esquerda]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // centro da parte do mapa que não fica atrás do painel (os botões + e − aproximam ali)
+  const centroLivre = () => {
+    const esq = margem?.esquerda || 0
+    return { x: esq + (tam.w - esq) / 2, y: (tam.h - (margem?.baixo || 0)) / 2 }
+  }
 
   function zoomEm(px, py, fator) {
     setVb((v) => {
       const mx = v.x + (px / tam.w) * v.w
       const my = v.y + (py / tam.h) * v.h
+      // não deixa passar do zoom máximo/mínimo; senão o mapa "pula" para outro ponto
+      const minW = Math.max(120, tam.w / 5)
+      const maxW = Math.min(IMG.largura, IMG.altura * (tam.w / tam.h))
+      fator = Math.min(Math.max(fator, minW / v.w), maxW / v.w)
+      if (Math.abs(fator - 1) < 1e-3) return v
       return limitar({ x: mx - (mx - v.x) * fator, y: my - (my - v.y) * fator, w: v.w * fator, h: v.h * fator })
     })
   }
@@ -260,11 +276,12 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
         const t = naTela(posPonto(l))
         ocupado.push({ x1: t.x - 16, x2: t.x + 16, y1: t.y - 16, y2: t.y + 16 })
       }
-      const e = naTela(PLANTA.entrada)
+      // as duas entradas ficam nas laterais do Pavilhão
       const el = naTela(PLANTA.entradaLateral)
+      const er = naTela(PLANTA.entradaDireita)
       for (const r of [
-        { x1: e.x - 30, x2: e.x + 30, y1: e.y + 4, y2: e.y + 24 },
         { x1: el.x - 66, x2: el.x - 6, y1: el.y - 10, y2: el.y + 10 },
+        { x1: er.x + 6, x2: er.x + 66, y1: er.y - 10, y2: er.y + 10 },
       ]) {
         const entrada = { ...r, id: null, texto: 'Entrada', classe: ' rotulo-entrada' }
         ocupado.push(entrada)
@@ -340,7 +357,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
 
           {/* telhado aberto: o Pavilhão por dentro, em 3D (aparece ao aproximar) */}
           <image href={PLANTA.imagem} x={PX} y={PY} width={PW} height={PH} preserveAspectRatio="none"
-            className={`pavilhao-dentro${aberto ? ' visivel' : ''}`} />
+            className={`pavilhao-dentro${aberto || rota?.pelaPavilhao ? ' visivel' : ''}`} />
 
           {/* rota: do número de origem até o número de destino */}
           {pontos && (() => {
@@ -401,8 +418,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       )}
 
       <div className="controles" style={{ bottom: (margem?.baixo || 0) + 12 }}>
-        <button aria-label="Aproximar" onClick={() => zoomEm(tam.w / 2, tam.h / 2, 1 / 1.6)}>+</button>
-        <button aria-label="Afastar" onClick={() => zoomEm(tam.w / 2, tam.h / 2, 1.6)}>−</button>
+        <button aria-label="Aproximar" onClick={() => zoomEm(centroLivre().x, centroLivre().y, 1 / 1.6)}>+</button>
+        <button aria-label="Afastar" onClick={() => zoomEm(centroLivre().x, centroLivre().y, 1.6)}>−</button>
       </div>
 
       {editor && clique && <div className="coordenadas">x: {clique.x}, y: {clique.y}</div>}

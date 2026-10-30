@@ -43,7 +43,7 @@ function Numero({ local, grande }) {
   )
 }
 
-const ondeFica = (l) => (l.dentro ? 'Dentro do Pavilhão (18)' : `Área externa · número ${l.numero}`)
+const ondeFica = (l) => (l.dentro ? `Dentro do Pavilhão (${pavilhao.numero})` : `Área externa · número ${l.numero}`)
 
 export default function App() {
   const [origem, setOrigem] = useState(() => buscarLocal(params.get('aqui')))
@@ -89,7 +89,8 @@ export default function App() {
     setPassos(false)
     const r = calcularRota(dados, grafo, origem, local)
     // tocou no mapa: só arrasta, mantendo à vista o lugar tocado; da lista: enquadra a partir de onde a pessoa está
-    if (r) setFoco(daLista ? caixaDaRota(origem, local, r) : { ...caixaDaRota(origem, local, r), manter: pontoDe(dados, local), mover: true })
+    // da lista: enquadra a rota toda; tocando no mapa: o mapa fica onde está (só arrasta se o lugar ficar atrás do painel)
+    if (r) setFoco(daLista ? caixaDaRota(origem, local, r) : { caixa: caixaDaRota(origem, local, r).caixa, manter: local.ponto || pontoDe(dados, local), soManter: true })
   }
 
   function Linha({ local }) {
@@ -120,14 +121,19 @@ export default function App() {
     }
     const itens = []
     itens.push(origem.dentro
-      ? <>Saia {origem.x != null ? <>de <strong>{origem.nome}</strong> e siga a linha até a entrada do </> : 'pela entrada do '}<Numero local={pavilhao} /> <strong>Pavilhão</strong></>
+      ? <>Saia {origem.x != null ? <>de <strong>{origem.nome}</strong> e siga a linha até a entrada lateral do </> : 'pela entrada lateral do '}<Numero local={pavilhao} /> <strong>Pavilhão</strong></>
       : <>Saia de <Numero local={origem} /> <strong>{origem.nome}</strong></>)
     if (rota.pontos.length > 1) {
-      itens.push(rota.referencias.length
-        ? <>Siga a linha azul passando por {rota.referencias.slice(0, 3).map((l, i, t) => (
+      // quando a rota atravessa o Pavilhão, ele tem um passo só dele
+      const refs = rota.pelaPavilhao ? rota.referencias.filter((l) => l.id !== dados.pavilhao) : rota.referencias
+      itens.push(refs.length
+        ? <>Siga a linha azul passando por {refs.slice(0, 3).map((l, i, t) => (
             <span key={l.id}><Numero local={l} /> {l.nome}{i < t.length - 2 ? ', ' : i === t.length - 2 ? ' e ' : ''}</span>
           ))}</>
         : <>Siga a linha azul</>)
+      if (rota.pelaPavilhao) {
+        itens.push(<>Entre pela lateral do <Numero local={pavilhao} /> <strong>Pavilhão</strong>, atravesse por dentro (passando pelas atrações) e saia pela outra lateral</>)
+      }
     }
     itens.push(destino.dentro
       ? (destino.x != null
@@ -211,7 +217,7 @@ export default function App() {
               <span className="dica-passo">{origem ? '2 de 2' : '1 de 2'}</span>
               <span>
                 <strong>{origem ? 'Toque no número para onde você quer ir.' : 'Toque no número do lugar onde você está.'}</strong>
-                <small>{origem ? 'Toque no número ou no nome. Aproxime o Pavilhão (18) para ver o que tem dentro.' : 'Arraste o mapa e use dois dedos para aproximar.'}</small>
+                <small>{origem ? `Toque no número ou no nome. Aproxime o Pavilhão (${pavilhao.numero}) para ver o que tem dentro.` : 'Arraste o mapa e use dois dedos para aproximar.'}</small>
               </span>
             </p>
             <button className="link" onClick={() => setLista(true)}>Ou escolha na lista</button>
