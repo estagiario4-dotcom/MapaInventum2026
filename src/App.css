@@ -22,7 +22,7 @@ button { font-family: inherit; color: inherit; cursor: pointer; }
 /* =================== mapa =================== */
 .mapa { position: absolute; inset: 0; overflow: hidden; }
 /* atrás do mapa: a própria imagem desfocada (aparece em cima e embaixo quando a rota é longa no celular) */
-.mapa::before { content: ''; position: absolute; inset: -60px; background: url(/mapa-inventum.webp) center / cover; filter: blur(28px) brightness(.75) saturate(1.1); }
+.mapa::before { content: ''; position: absolute; inset: -60px; background: var(--fundo) center / cover; filter: blur(28px) brightness(.75) saturate(1.1); }
 .mapa > svg { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; user-select: none; }
 .veu { fill: #000; opacity: .18; pointer-events: none; }
 

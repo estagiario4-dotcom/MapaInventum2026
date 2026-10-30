@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import dados from './dados/mapa.json'
 import { pontoDe } from './rota'
+// as imagens passam pelo build: ganham um nome com "impressão digital" e ficam guardadas no celular
+// (quem reabre o mapa não baixa de novo). Para trocar, substitua o arquivo em src/imagens/.
+import imgMapa from './imagens/mapa-inventum.webp'
+import imgPavilhao from './imagens/pavilhao-dentro.webp'
 
 const IMG = dados.imagem
 export const MAPA_INTEIRO = { x: 0, y: 0, w: IMG.largura, h: IMG.altura }
@@ -70,6 +74,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
   const ultimoToque = useRef(null)
   const [tam, setTam] = useState({ w: 0, h: 0 })
   const [vb, setVb] = useState(null)
+  const jaAbriuRef = useRef(false)
   // movimento suave (o mapa desliza até o lugar, em vez de pular)
   const vbAtual = useRef(null)
   vbAtual.current = vb
@@ -309,6 +314,10 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
   // 1 pixel da tela em unidades do mapa
   const px = vb ? vb.w / tam.w : 1
   const aberto = px <= limitePlanta()
+  // o Pavilhão aparece na tela agora?
+  const pavNaTela = vb && vb.x < PX + PW && vb.x + vb.w > PX && vb.y < PY + PH && vb.y + vb.h > PY
+  if (((aberto && pavNaTela) || rota?.pelaPavilhao || origem?.dentro || destino?.dentro) && !jaAbriuRef.current) jaAbriuRef.current = true
+  const jaAbriu = jaAbriuRef.current
   const naTela = (p) => ({ x: ((p.x - vb.x) / vb.w) * tam.w, y: ((p.y - vb.y) / vb.h) * tam.h })
 
   const pOrigem = origem ? pontoDe(dados, origem) : null
@@ -406,7 +415,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
   rotulosNaTela.current = rotulos
 
   return (
-    <div className="mapa" ref={caixa}>
+    <div className="mapa" ref={caixa} style={{ '--fundo': `url(${imgMapa})` }}>
       {vb && (
         <svg
           viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
@@ -415,7 +424,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
           onPointerUp={aoSoltar}
           onPointerCancel={aoSoltar}
         >
-          <image href={IMG.arquivo} x="0" y="0" width={IMG.largura} height={IMG.altura} preserveAspectRatio="none" />
+          <image href={imgMapa} x="0" y="0" width={IMG.largura} height={IMG.altura} preserveAspectRatio="none" />
 
           {/* deixa o resto do mapa mais apagado quando tem rota, para a linha aparecer */}
           {pontos && <rect x="0" y="0" width={IMG.largura} height={IMG.altura} className="veu" />}
@@ -430,8 +439,11 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
           ))}
 
           {/* telhado aberto: o Pavilhão por dentro, em 3D (aparece ao aproximar) */}
-          <image href={PLANTA.imagem} x={PX} y={PY} width={PW} height={PH} preserveAspectRatio="none"
-            className={`pavilhao-dentro${aberto || rota?.pelaPavilhao ? ' visivel' : ''}`} />
+          {/* só baixa a imagem de dentro na primeira vez que ela é usada (economiza dados de quem não abre o Pavilhão) */}
+          {jaAbriu && (
+            <image href={imgPavilhao} x={PX} y={PY} width={PW} height={PH} preserveAspectRatio="none"
+              className={`pavilhao-dentro${aberto || rota?.pelaPavilhao ? ' visivel' : ''}`} />
+          )}
 
           {/* rota: do número de origem até o número de destino */}
           {pontos && (() => {

@@ -1,6 +1,6 @@
 # Mapa Inventum 2026
 
-Mapa do evento para celular. A base é a imagem final do mapa (`public/mapa-inventum.webp`), com os números dela (1 a 20) e sem o QR code e as tabelas: o nome de cada lugar aparece ao lado do número. A pessoa escaneia o QR code e aparece "Você está aqui". Ela toca no número ou no nome do lugar no mapa (ou escolhe na lista) e aparece a rota. Tocar de novo no mesmo lugar (ou no X) desmarca.
+Mapa do evento para celular. A base é a imagem final do mapa (`src/imagens/mapa-inventum.webp`), com os números dela (1 a 20) e sem o QR code e as tabelas: o nome de cada lugar aparece ao lado do número. A pessoa escaneia o QR code e aparece "Você está aqui". Ela toca no número ou no nome do lugar no mapa (ou escolhe na lista) e aparece a rota. Tocar de novo no mesmo lugar (ou no X) desmarca.
 
 - A rota é uma linha azul por cima da imagem, da origem até o destino, seguindo os caminhos do evento.
 - O painel mostra "Como chegar" em passos: de onde sair, por quais lugares passar e onde chegar, com o tempo a pé.
@@ -22,7 +22,7 @@ Abrir `http://localhost:5173/?aqui=food-truck` (o `aqui` é o `id` de um local).
 
 As posições são medidas na imagem com largura 1600 e altura 800 (`imagem.largura` e `imagem.altura`), não importa o tamanho real do arquivo.
 
-- **imagem**: o arquivo do mapa (fica em `public/`).
+- **imagem**: tamanho de referência do mapa. O arquivo fica em `src/imagens/` (o build dá a ele um nome único, assim o celular guarda a imagem e não baixa de novo).
 - **locais**: cada lugar.
   - `id`: vai no QR code (`?aqui=id`). Não mudar depois de imprimir.
   - `numero`: o número que aparece na imagem.
@@ -32,7 +32,7 @@ As posições são medidas na imagem com largura 1600 e altura 800 (`imagem.larg
   - `no`: em qual ponto do caminho o lugar se liga. A rota chega por ele.
   - `dentro: true`: atração de dentro do Pavilhão. `x`, `y` é o meio do espaço dela (onde a rota chega), `ponto` é onde fica a bolinha com o ícone, `no` é a porta dela no corredor e `icone` é o desenho da bolinha (pato, foto, empresa, palco, banheiro, drone, bola, foguete, fone, volante, arvore, controle, robo, cafe, chip, vr, planeta). Sem `x`, `y` e `no` (ex.: Expositores), não aparece no mapa e a rota vai até a entrada do Pavilhão.
 - **pavilhao**: o `id` do lugar que representa o Pavilhão (Exposição Interna).
-- **planta**: o Pavilhão por dentro. Com o mapa aproximado, o telhado some e aparece o desenho 3D de dentro (`imagem`, em `public/pavilhao-dentro.webp`, feito a partir da planta interna do Miro). `contorno` é `[x, y, largura, altura]` do telhado; `entrada` (porta da frente) e `entradaLateral` (ENTRADA 01) marcam as portas. Os corredores de dentro são os nós `pv...` em `nos` e `caminhos`; a porta da frente liga no nó `entrada` e a lateral no corredor dos food trucks (`f4`).
+- **planta**: o Pavilhão por dentro. Com o mapa aproximado, o telhado some e aparece o desenho 3D de dentro (`imagem`, em `src/imagens/pavilhao-dentro.webp`, feito a partir da planta interna do Miro). `contorno` é `[x, y, largura, altura]` do telhado; `entrada` (porta da frente) e `entradaLateral` (ENTRADA 01) marcam as portas. Os corredores de dentro são os nós `pv...` em `nos` e `caminhos`; a porta da frente liga no nó `entrada` e a lateral no corredor dos food trucks (`f4`).
 - **nos**: pontos dos caminhos (`x`, `y` na imagem).
 - **caminhos**: ligações entre dois nós. A rota só anda por elas. Um 3º número opcional deixa o trecho "mais caro" (ex.: `["p1", "entrada", 4]`): a calçada da frente do Pavilhão tem custo 4, para que quem está à esquerda e vai para o Auditório (ou outro lugar à direita) passe por dentro do Pavilhão.
 - **metrosPorUnidade**: usado para o tempo a pé (aproximado).
@@ -41,7 +41,7 @@ As posições são medidas na imagem com largura 1600 e altura 800 (`imagem.larg
 
 ### Quando chegar a versão final da imagem
 
-1. Exporte a imagem nova (2:1, de preferência com 3200 px de largura) e salve por cima de `public/mapa-inventum.webp` (ou troque `imagem.arquivo`).
+1. Exporte a imagem nova (2:1, de preferência com 3200 px de largura) e salve por cima de `src/imagens/mapa-inventum.webp` (mesmo nome).
 2. Abra com `?editor` (ex.: `http://localhost:5173/?editor`) e toque em cada lugar e em cada curva dos caminhos para ver o `x, y`.
 3. Atualize `locais`, `nos` e `caminhos` no JSON e rode `node scripts/testar-rotas.mjs`.
 

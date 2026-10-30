@@ -1,6 +1,6 @@
 {
  "imagem": {
-  "arquivo": "/mapa-inventum.webp",
+  "arquivo": "src/imagens/mapa-inventum.webp",
   "largura": 1600,
   "altura": 800
  },
@@ -1244,7 +1244,7 @@
   ]
  ],
  "planta": {
-  "imagem": "/pavilhao-dentro.webp",
+  "imagem": "src/imagens/pavilhao-dentro.webp",
   "contorno": [
    884,
    271,
