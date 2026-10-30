@@ -63,8 +63,20 @@ export function pontoDe(dados, local) {
 
 // Rota de um lugar até outro.
 // pontos: o caminho (de nó em nó); referencias: lugares com número que ficam no caminho
+// O Pavilhão (e o que fica dentro sem lugar marcado) tem duas portas: usa a mais perto
+function nosPossiveis(dados, local) {
+  if ((local.id === dados.pavilhao || (local.dentro && !local.no)) && dados.portasPavilhao) return dados.portasPavilhao
+  return [noDe(dados, local)]
+}
+
 export function calcularRota(dados, grafo, origem, destino) {
-  const r = menorCaminho(grafo, noDe(dados, origem), noDe(dados, destino))
+  let r = null
+  for (const a of nosPossiveis(dados, origem)) {
+    for (const b of nosPossiveis(dados, destino)) {
+      const t = menorCaminho(grafo, a, b)
+      if (t && (!r || t.distancia < r.distancia)) r = t
+    }
+  }
   if (!r) return null
 
   const pontos = r.caminho.map((id) => dados.nos[id])
@@ -79,6 +91,23 @@ export function calcularRota(dados, grafo, origem, destino) {
   // distância de verdade (sem o custo extra dos trechos evitados)
   let d = 0
   for (let i = 1; i < pontos.length; i++) d += Math.hypot(pontos[i].x - pontos[i - 1].x, pontos[i].y - pontos[i - 1].y)
-  const pelaPavilhao = !origem.dentro && !destino.dentro && r.caminho.some((id) => id.startsWith('pv'))
-  return { destino, pontos, referencias, pelaPavilhao, metros: d * dados.metrosPorUnidade }
+  const ehPav = (l) => l.dentro || l.id === dados.pavilhao
+  const pelaPavilhao = !ehPav(origem) && !ehPav(destino) && r.caminho.some((id) => id.startsWith('pv'))
+
+  // trechos na ORDEM em que a pessoa passa: lugares com número e a travessia do Pavilhão
+  // (quando a rota usa os corredores de dentro, o próprio Pavilhão não entra como "lugar")
+  const usaDentro = r.caminho.some((id) => id.startsWith('pv'))
+  const trechos = []
+  for (const id of meio) {
+    if (pelaPavilhao && id.startsWith('pv')) {
+      if (!trechos.some((t) => t.pavilhao)) trechos.push({ pavilhao: true })
+      continue
+    }
+    for (const l of dados.locais) {
+      if (!l.numero || l.no !== id || l.id === origem.id || l.id === destino.id) continue
+      if (usaDentro && l.id === dados.pavilhao) continue
+      if (!trechos.some((t) => t.local === l)) trechos.push({ local: l })
+    }
+  }
+  return { destino, pontos, referencias, trechos, pelaPavilhao, metros: d * dados.metrosPorUnidade }
 }

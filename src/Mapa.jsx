@@ -67,8 +67,27 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
   const ponteiros = useRef(new Map())
   const gesto = useRef(null)
   const rotulosNaTela = useRef([])
+  const ultimoToque = useRef(null)
   const [tam, setTam] = useState({ w: 0, h: 0 })
   const [vb, setVb] = useState(null)
+  // movimento suave (o mapa desliza até o lugar, em vez de pular)
+  const vbAtual = useRef(null)
+  vbAtual.current = vb
+  const anim = useRef(0)
+  function pararAnimacao() { cancelAnimationFrame(anim.current) }
+  function animarPara(alvo) {
+    pararAnimacao()
+    const de = vbAtual.current
+    if (!de || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return setVb(alvo)
+    const t0 = performance.now(), dur = 380
+    const passo = (t) => {
+      const p = Math.min((t - t0) / dur, 1)
+      const e = 1 - Math.pow(1 - p, 3)
+      setVb({ x: de.x + (alvo.x - de.x) * e, y: de.y + (alvo.y - de.y) * e, w: de.w + (alvo.w - de.w) * e, h: de.h + (alvo.h - de.h) * e })
+      if (p < 1) anim.current = requestAnimationFrame(passo)
+    }
+    anim.current = requestAnimationFrame(passo)
+  }
   const [clique, setClique] = useState(null)
 
   useEffect(() => {
@@ -79,8 +98,13 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
 
   // o mapa ocupa a tela toda: não afasta além da imagem.
   // Pode arrastar um pouco além da borda só o suficiente para nada ficar escondido atrás do painel.
+  // afastar ao máximo com o dedo: a altura toda da imagem na tela
+  const maxNormal = () => Math.min(IMG.largura, IMG.altura * (tam.w / tam.h))
   function limitar(v) {
-    const maxW = Math.min(IMG.largura, IMG.altura * (tam.w / tam.h))
+    // proteção: nunca aceita um enquadramento inválido (o mapa travaria)
+    if (![v.x, v.y, v.w, v.h].every(Number.isFinite)) return vbAtual.current || { x: 0, y: 0, w: IMG.largura, h: IMG.altura }
+    // (uma rota longa pode afastar mais, até a largura toda, para caber inteira no celular)
+    const maxW = IMG.largura
     const cx = v.x + v.w / 2
     const cy = v.y + v.h / 2
     // zoom máximo: no máximo 5 pixels de tela por unidade (a imagem não fica borrada)
@@ -91,7 +115,9 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     const baixo = (margem?.baixo || 0) * k
     const esquerda = (margem?.esquerda || 0) * k
     const x = Math.min(Math.max(cx - w / 2, -esquerda), IMG.largura - w)
-    const y = Math.min(Math.max(cy - h / 2, -topo), IMG.altura - h + baixo)
+    let y = Math.min(Math.max(cy - h / 2, -topo), IMG.altura - h + baixo)
+    // sobrou espaço em cima e embaixo: deixa a imagem no meio da parte livre
+    if (h - topo - baixo > IMG.altura) y = IMG.altura / 2 - (topo + h - baixo) / 2
     return { x, y, w, h }
   }
 
@@ -106,7 +132,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     const livreH = Math.max(tam.h - topo - baixo, 120)
     const livreW = Math.max(tam.w - esquerda - 24, 120)
     // escala (unidades do mapa por pixel), sem passar do zoom máximo e do mínimo
-    const maxEscala = Math.min(IMG.largura, IMG.altura * (tam.w / tam.h)) / tam.w
+    const maxEscala = (soManter ? maxNormal() : IMG.largura) / tam.w
     const escala = (mover || soManter) && vb ? vb.w / tam.w
       : Math.min(Math.max(Math.max(b.w / livreW, b.h / livreH) * 1.08, Math.max(120, tam.w / 5) / tam.w), maxEscala)
     let v = soManter && vb ? { ...vb } : {
@@ -131,13 +157,48 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       v = { ...v, y: Math.min(v.y, yMax) }
     }
     v = limitar(v)
-    setVb(v)
+    animarPara(v)
   }
 
+  // "fresco": o enquadramento ainda não foi mexido pela pessoa (arrastar, zoom, toque)
+  const fresco = useRef(true)
+  function aplicarFoco() {
+    if (foco?.pavilhao) abrirPavilhao(foco.centro)
+    else if (foco) enquadrar(foco.caixa, foco.manter, foco.mover, foco.soManter)
+  }
   useEffect(() => {
-    if (tam.w && foco) enquadrar(foco.caixa, foco.manter, foco.mover, foco.soManter)
-    // refaz quando o painel muda de tamanho, para a rota não ficar escondida atrás dele
-  }, [foco, tam.w, tam.h, margem?.baixo, margem?.esquerda]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (!tam.w || !foco) return
+    fresco.current = true
+    aplicarFoco()
+  }, [foco, tam.w, tam.h]) // eslint-disable-line react-hooks/exhaustive-deps
+  // o painel mudou de tamanho: só refaz se a pessoa ainda não mexeu no mapa;
+  // se já mexeu, o mapa fica onde está (no máximo arrasta o lugar escolhido para fora de trás do painel)
+  useEffect(() => {
+    if (!tam.w || !foco || !vb) return
+    if (fresco.current) aplicarFoco()
+    else if (foco.manter) enquadrar(foco.caixa, foco.manter, false, true)
+  }, [margem?.baixo, margem?.esquerda]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // aproxima o Pavilhão o suficiente para "abrir o telhado" e mostrar as atrações
+  // o telhado "abre" com o mapa aproximado, ou quando o Pavilhão inteiro já cabe na largura livre da tela
+  function limitePlanta() {
+    return ZOOM_PLANTA
+  }
+
+  // aproxima até abrir o telhado. No computador o Pavilhão cabe inteiro;
+  // no celular fica no zoom de ver as atrações e dá para arrastar para os lados.
+  function abrirPavilhao(centro) {
+    const esqPx = margem?.esquerda || 0
+    const cabe = (PW * 1.06) / (tam.w - esqPx - 16)
+    const k = Math.max(Math.min(cabe, ZOOM_PLANTA * 0.92), Math.max(120, tam.w / 5) / tam.w)
+    const w = tam.w * k, h = tam.h * k
+    const baixo = (margem?.baixo || 0) * k
+    const livreW = (tam.w - esqPx) * k
+    const c = centro || { x: PX + PW / 2, y: PY + PH / 2 }
+    animarPara(limitar({ x: c.x - esqPx * k - livreW / 2, y: c.y - (h - baixo) / 2, w, h }))
+  }
+
+
 
   // centro da parte do mapa que não fica atrás do painel (os botões + e − aproximam ali)
   const centroLivre = () => {
@@ -151,7 +212,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       const my = v.y + (py / tam.h) * v.h
       // não deixa passar do zoom máximo/mínimo; senão o mapa "pula" para outro ponto
       const minW = Math.max(120, tam.w / 5)
-      const maxW = Math.min(IMG.largura, IMG.altura * (tam.w / tam.h))
+      const maxW = Math.max(maxNormal(), v.w)
       fator = Math.min(Math.max(fator, minW / v.w), maxW / v.w)
       if (Math.abs(fator - 1) < 1e-3) return v
       return limitar({ x: mx - (mx - v.x) * fator, y: my - (my - v.y) * fator, w: v.w * fator, h: v.h * fator })
@@ -162,6 +223,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     const el = caixa.current
     function roda(e) {
       e.preventDefault()
+      fresco.current = false
+      pararAnimacao()
       const r = el.getBoundingClientRect()
       zoomEm(e.clientX - r.left, e.clientY - r.top, e.deltaY > 0 ? 1.15 : 1 / 1.15)
     }
@@ -175,6 +238,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
   }
 
   function aoPressionar(e) {
+    fresco.current = false
+    pararAnimacao()
     e.currentTarget.setPointerCapture(e.pointerId)
     ponteiros.current.set(e.pointerId, pos(e))
     if (ponteiros.current.size === 1) gesto.current = { inicio: pos(e), moveu: false }
@@ -214,32 +279,41 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     const nome = rotulosNaTela.current.find((r) => r.id && p.x >= r.x1 && p.x <= r.x2 && p.y >= r.y1 && p.y <= r.y2)
     if (nome) return aoTocar(nome.id)
     // com o telhado aberto, o toque dentro do Pavilhão escolhe a atração tocada
-    if (vb.w / tam.w <= ZOOM_PLANTA && dentroDaPlanta(ponto)) {
+    if (vb.w / tam.w <= limitePlanta() && dentroDaPlanta(ponto)) {
       const k = vb.w / tam.w
       let alvo = null
       for (const l of internos) {
         const d = Math.hypot(posPonto(l).x - ponto.x, posPonto(l).y - ponto.y)
         if (d < 22 * k && (!alvo || d < alvo.d)) alvo = { l, d }
       }
-      if (alvo) aoTocar(alvo.l.id)
-      return
+      if (alvo) return aoTocar(alvo.l.id)
     }
+    const dentroAberto = vb.w / tam.w <= limitePlanta() && dentroDaPlanta(ponto)
     // toque perto de um número escolhe esse lugar
     const raio = Math.max(26, 26 * (vb.w / tam.w))
     let perto = null
-    for (const l of numerados) {
+    for (const l of dentroAberto ? [] : numerados) {
       const d = Math.hypot(l.x - ponto.x, l.y - ponto.y)
       if (d < raio && (!perto || d < perto.d)) perto = { l, d }
     }
-    if (perto) aoTocar(perto.l.id)
+    if (perto) return aoTocar(perto.l.id)
+    // dois toques rápidos fora de um lugar: aproxima ali
+    const agora = Date.now()
+    const ult = ultimoToque.current
+    if (ult && agora - ult.t < 350 && Math.hypot(p.x - ult.x, p.y - ult.y) < 40) {
+      ultimoToque.current = null
+      zoomEm(p.x, p.y, 1 / 1.8)
+    } else ultimoToque.current = { t: agora, x: p.x, y: p.y }
   }
 
   // 1 pixel da tela em unidades do mapa
   const px = vb ? vb.w / tam.w : 1
-  const aberto = px <= ZOOM_PLANTA
+  const aberto = px <= limitePlanta()
   const naTela = (p) => ({ x: ((p.x - vb.x) / vb.w) * tam.w, y: ((p.y - vb.y) / vb.h) * tam.h })
 
   const pOrigem = origem ? pontoDe(dados, origem) : null
+  // onde fica a bolinha de quem está dentro do Pavilhão (a etiqueta "Você está aqui" fica presa nela)
+  const cOrigem = origem ? origem.ponto || pOrigem : null
   const pDestino = destino ? pontoDe(dados, destino) : null
   const pontos = rota?.pontos
 
@@ -259,8 +333,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       const t = naTela(l)
       return { x1: t.x - R0, x2: t.x + R0, y1: t.y - R0, y2: t.y + R0 }
     })
-    if (pOrigem && naVista(naTela(pOrigem))) {
-      const t = naTela(pOrigem)
+    if (cOrigem && naVista(naTela(cOrigem))) {
+      const t = naTela(cOrigem)
       const x = Math.min(Math.max(t.x, 80), tam.w - 80)
       ocupado.push({ x1: x - 75, x2: x + 75, y1: t.y + 28, y2: t.y + 64 })
     }
@@ -399,8 +473,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       ))}
 
       {/* "Você está aqui" sempre legível */}
-      {vb && pOrigem && naVista(naTela(pOrigem)) && (() => {
-        const t = naTela(pOrigem)
+      {vb && cOrigem && naVista(naTela(cOrigem)) && (() => {
+        const t = naTela(cOrigem)
         return (
           <div className="voce-aqui" style={{ left: Math.min(Math.max(t.x, 80), tam.w - 80), top: t.y }}>
             <span>Você está aqui</span>
@@ -416,6 +490,24 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
           <button aria-label="Desmarcar destino" onClick={aoLimpar}>×</button>
         </div>
       )}
+
+      {/* dica: aproximar o Pavilhão para ver as atrações de dentro */}
+      {vb && !aberto && !rota && (() => {
+        // fica no meio da parte do telhado que aparece na tela
+        const a = naTela({ x: PX, y: PY })
+        const b = naTela({ x: PX + PW, y: PY + PH })
+        const x1 = Math.max(a.x, (margem?.esquerda || 0) + 8), x2 = Math.min(b.x, tam.w - 8)
+        const y1 = Math.max(a.y, 8), y2 = Math.min(b.y, tam.h - (margem?.baixo || 0) - 8)
+        if (x2 - x1 < 90 || y2 - y1 < 36) return null
+        const t = { x: (x1 + x2) / 2, y: y1 + (y2 - y1) * 0.6 }
+        return (
+          <button className="ver-dentro" style={{ left: t.x, top: t.y }}
+            onClick={() => abrirPavilhao()}>
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" strokeWidth="2.4" /><path d="M15 15l5 5M10.5 8v5M8 10.5h5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" /></svg>
+            Ver atrações por dentro
+          </button>
+        )
+      })()}
 
       <div className="controles" style={{ bottom: (margem?.baixo || 0) + 12 }}>
         <button aria-label="Aproximar" onClick={() => zoomEm(centroLivre().x, centroLivre().y, 1 / 1.6)}>+</button>

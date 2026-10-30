@@ -29,8 +29,10 @@ function caixaEmVolta(pts) {
 
 // visão perto de onde a pessoa está (ou na área dos estandes)
 function visaoPerto(local) {
-  const c = local ? pontoDe(dados, local) : { x: 560, y: 400 }
-  return { caixa: { x: c.x - 200, y: c.y - 150, w: 400, h: 300 } }
+  // no celular, mais perto (dá para ler os números); no computador, uma área maior
+  const c = local ? pontoDe(dados, local) : { x: 600, y: 360 }
+  const w = window.innerWidth < 700 ? 230 : 400
+  return { caixa: { x: c.x - w / 2, y: c.y - w * 0.375, w, h: w * 0.75 } }
 }
 
 // bolinha com o número (igual à do mapa); lugares do Pavilhão mostram o 18 em vermelho
@@ -89,8 +91,13 @@ export default function App() {
     setPassos(false)
     const r = calcularRota(dados, grafo, origem, local)
     // tocou no mapa: só arrasta, mantendo à vista o lugar tocado; da lista: enquadra a partir de onde a pessoa está
-    // da lista: enquadra a rota toda; tocando no mapa: o mapa fica onde está (só arrasta se o lugar ficar atrás do painel)
-    if (r) setFoco(daLista ? caixaDaRota(origem, local, r) : { caixa: caixaDaRota(origem, local, r).caixa, manter: local.ponto || pontoDe(dados, local), soManter: true })
+    // tocando no mapa: o mapa fica onde está (só arrasta se o lugar ficar atrás do painel);
+    // pela lista: leva o mapa até o lugar escolhido (atrações de dentro já com o telhado aberto)
+    if (!r) return
+    const alvo = local.ponto || pontoDe(dados, local)
+    if (!daLista) setFoco({ caixa: caixaDaRota(origem, local, r).caixa, manter: alvo, soManter: true })
+    else if (local.dentro && local.x != null) setFoco({ pavilhao: true, centro: alvo })
+    else setFoco({ caixa: { x: alvo.x - 130, y: alvo.y - 100, w: 260, h: 200 }, manter: alvo })
   }
 
   function Linha({ local }) {
@@ -124,16 +131,26 @@ export default function App() {
       ? <>Saia {origem.x != null ? <>de <strong>{origem.nome}</strong> e siga a linha até a entrada lateral do </> : 'pela entrada lateral do '}<Numero local={pavilhao} /> <strong>Pavilhão</strong></>
       : <>Saia de <Numero local={origem} /> <strong>{origem.nome}</strong></>)
     if (rota.pontos.length > 1) {
-      // quando a rota atravessa o Pavilhão, ele tem um passo só dele
-      const refs = rota.pelaPavilhao ? rota.referencias.filter((l) => l.id !== dados.pavilhao) : rota.referencias
-      itens.push(refs.length
-        ? <>Siga a linha azul passando por {refs.slice(0, 3).map((l, i, t) => (
-            <span key={l.id}><Numero local={l} /> {l.nome}{i < t.length - 2 ? ', ' : i === t.length - 2 ? ' e ' : ''}</span>
-          ))}</>
-        : <>Siga a linha azul</>)
-      if (rota.pelaPavilhao) {
-        itens.push(<>Entre pela lateral do <Numero local={pavilhao} /> <strong>Pavilhão</strong>, atravesse por dentro (passando pelas atrações) e saia pela outra lateral</>)
+      // passos na ordem do caminho: grupos de lugares e, se for o caso, a travessia do Pavilhão
+      const lista = (ls) => ls.slice(0, 4).map((l, i, t) => (
+        <span key={l.id}><Numero local={l} /> {l.nome}{i < t.length - 2 ? ', ' : i === t.length - 2 ? ' e ' : ''}</span>
+      ))
+      let grupo = []
+      let algum = false
+      const fechar = () => {
+        if (grupo.length) itens.push(<>{algum ? 'Continue pela' : 'Siga a'} linha azul passando por {lista(grupo)}</>)
+        if (grupo.length) algum = true
+        grupo = []
       }
+      for (const t of rota.trechos) {
+        if (t.pavilhao) {
+          fechar()
+          itens.push(<>Entre pela lateral do <Numero local={pavilhao} /> <strong>Pavilhão</strong>, atravesse por dentro (passando pelas atrações) e saia pela outra lateral</>)
+          algum = true
+        } else grupo.push(t.local)
+      }
+      fechar()
+      if (!algum) itens.push(<>Siga a linha azul</>)
     }
     itens.push(destino.dentro
       ? (destino.x != null
@@ -217,10 +234,13 @@ export default function App() {
               <span className="dica-passo">{origem ? '2 de 2' : '1 de 2'}</span>
               <span>
                 <strong>{origem ? 'Toque no número para onde você quer ir.' : 'Toque no número do lugar onde você está.'}</strong>
-                <small>{origem ? `Toque no número ou no nome. Aproxime o Pavilhão (${pavilhao.numero}) para ver o que tem dentro.` : 'Arraste o mapa e use dois dedos para aproximar.'}</small>
+                <small>{origem ? 'Toque no número ou no nome do lugar. Dois toques no mapa aproximam.' : 'Arraste o mapa. Dois toques ou dois dedos aproximam.'}</small>
               </span>
             </p>
-            <button className="link" onClick={() => setLista(true)}>Ou escolha na lista</button>
+            <div className="acoes">
+              <button className="link" onClick={() => setLista(true)}>Escolher na lista</button>
+              <button className="link vermelho" onClick={() => setFoco({ pavilhao: true })}>Ver atrações do Pavilhão</button>
+            </div>
           </>
         )}
       </section>
