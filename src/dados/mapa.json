@@ -188,10 +188,10 @@
    "no": "f4"
   },
   {
-   "id": "pavilhao-pato-holografico",
-   "nome": "Pato Holográfico",
-   "rotulo": "Pato Holográfico",
-   "icone": "pato",
+   "id": "pavilhao-balao-virtual",
+   "nome": "Balão Virtual",
+   "rotulo": "Balão Virtual",
+   "icone": "balao",
    "dentro": true,
    "x": 906.1,
    "y": 289.8,
@@ -199,6 +199,20 @@
    "ponto": {
     "x": 906.0,
     "y": 277.7
+   }
+  },
+  {
+   "id": "pavilhao-pato-holografico",
+   "nome": "Pato Holográfico",
+   "rotulo": "Pato Holográfico",
+   "icone": "pato",
+   "dentro": true,
+   "x": 905.5,
+   "y": 351.6,
+   "no": "pv6",
+   "ponto": {
+    "x": 905.5,
+    "y": 345.5
    }
   },
   {
@@ -213,20 +227,6 @@
    "ponto": {
     "x": 906.4,
     "y": 312.1
-   }
-  },
-  {
-   "id": "pavilhao-akiyama",
-   "nome": "Akiyama",
-   "rotulo": "Akiyama",
-   "icone": "empresa",
-   "dentro": true,
-   "x": 905.5,
-   "y": 351.6,
-   "no": "pv6",
-   "ponto": {
-    "x": 905.5,
-    "y": 345.5
    }
   },
   {

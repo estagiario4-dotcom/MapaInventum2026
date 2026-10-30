@@ -30,7 +30,7 @@ As posições são medidas na imagem com largura 1600 e altura 800 (`imagem.larg
   - `nome`: aparece na lista e nos passos.
   - `x`, `y`: onde fica o número na imagem (é onde a pessoa toca).
   - `no`: em qual ponto do caminho o lugar se liga. A rota chega por ele.
-  - `dentro: true`: atração de dentro do Pavilhão. `x`, `y` é o meio do espaço dela (onde a rota chega), `ponto` é onde fica a bolinha com o ícone, `no` é a porta dela no corredor e `icone` é o desenho da bolinha (pato, foto, empresa, palco, banheiro, drone, bola, foguete, fone, volante, arvore, controle, robo, cafe, chip, vr, planeta). Sem `x`, `y` e `no` (ex.: Expositores), não aparece no mapa e a rota vai até a entrada do Pavilhão.
+  - `dentro: true`: atração de dentro do Pavilhão. `x`, `y` é o meio do espaço dela (onde a rota chega), `ponto` é onde fica a bolinha com o ícone, `no` é a porta dela no corredor e `icone` é o desenho da bolinha (balao, pato, foto, empresa, palco, banheiro, drone, bola, foguete, fone, volante, arvore, controle, robo, cafe, chip, vr, planeta). Sem `x`, `y` e `no` (ex.: Expositores), não aparece no mapa e a rota vai até a entrada do Pavilhão.
 - **pavilhao**: o `id` do lugar que representa o Pavilhão (Exposição Interna).
 - **planta**: o Pavilhão por dentro. Com o mapa aproximado, o telhado some e aparece o desenho 3D de dentro (`imagem`, em `src/imagens/pavilhao-dentro.webp`, feito a partir da planta interna do Miro). `contorno` é `[x, y, largura, altura]` do telhado; `entrada` (porta da frente) e `entradaLateral` (ENTRADA 01) marcam as portas. Os corredores de dentro são os nós `pv...` em `nos` e `caminhos`; a porta da frente liga no nó `entrada` e a lateral no corredor dos food trucks (`f4`).
 - **nos**: pontos dos caminhos (`x`, `y` na imagem).

@@ -18,6 +18,7 @@ const internos = dados.locais.filter((l) => l.dentro && l.x != null)
 
 // ícones das atrações (24x24, traço branco)
 const ICONES = {
+  balao: 'M12 3a6 6 0 0 0-6 6c0 3.2 2.6 5.6 4 7h4c1.4-1.4 4-3.8 4-7a6 6 0 0 0-6-6zM12 3c-1.6 2-2 4.5-2 6s.6 4.6 2 7M12 3c1.6 2 2 4.5 2 6s-.6 4.6-2 7M10 16l.5 2.5M14 16l-.5 2.5M9.5 18.5h5v2.5h-5z',
   pato: 'M6 14c0 3.3 2.7 5 6 5s6-1.7 6-5c0-1.8-1.2-3-2.6-3.5A4 4 0 1 0 8 9c0 .9.3 1.6.7 2.2C7.1 11.8 6 12.8 6 14zM13.5 8h.01M15.8 8.6l3.2.9-3.2.9',
   foto: 'M4 8h3l2-3h6l2 3h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
   empresa: 'M4 8h16v11H4zM9 8V5h6v3M4 13h16',
