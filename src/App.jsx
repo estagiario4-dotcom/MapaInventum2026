@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import dados from './dados/mapa.json'
 import { pontoDe } from './rota'
-import Mapa from './Mapa'
+import Mapa, { ICONES } from './Mapa'
 import programacao from './dados/programacao.json'
 import './App.css'
 
@@ -32,33 +32,35 @@ function visaoAbertura() {
   return { caixa: PATROCINADORES, depois: true }
 }
 
-// programação do evento (src/dados/programacao.json): atividades de cada lugar, em ordem de dia e hora
-const atividadesDe = (local) => programacao.atividades
-  .filter((a) => a.local === local.id)
-  .sort((a, b) => (a.dia + (a.inicio || '99')).localeCompare(b.dia + (b.inicio || '99')))
-const DIAS = { '2026-11-04': 'Qua 04/11', '2026-11-05': 'Qui 05/11', '2026-11-06': 'Sex 06/11', '2026-11-07': 'Sáb 07/11', '2026-11-08': 'Dom 08/11' }
 const hojeISO = () => {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+// programação do evento (src/dados/programacao.json): atividades de cada lugar, em ordem de dia e hora
+// (dias que já passaram saem da lista, para não mostrar informação antiga)
+const atividadesDe = (local) => programacao.atividades
+  .filter((a) => a.local === local.id && a.dia >= hojeISO())
+  .sort((a, b) => (a.dia + (a.inicio || '99')).localeCompare(b.dia + (b.inicio || '99')))
+const DIAS = { '2026-11-04': 'Qua 04/11', '2026-11-05': 'Qui 05/11', '2026-11-06': 'Sex 06/11', '2026-11-07': 'Sáb 07/11', '2026-11-08': 'Dom 08/11' }
+
 function Agenda({ local }) {
   const lista = atividadesDe(local)
   const hoje = hojeISO()
-  // durante a feira, mostra de hoje em diante; antes, mostra tudo
-  const proximas = lista.filter((a) => a.dia >= hoje)
-  const mostrar = proximas.length ? proximas : lista
-  const dias = [...new Set(mostrar.map((a) => a.dia))]
+  const dias = [...new Set(lista.map((a) => a.dia))]
   // quando o número junta mais de um espaço (ex.: Auditório e Mini Auditório), mostra em qual é cada atividade
-  const varios = new Set(lista.map((a) => a.localNoSite)).size > 1
-  if (!lista.length) return <p className="aviso">Ainda não há programação cadastrada para este lugar.</p>
+  const varios = new Set(programacao.atividades.filter((a) => a.local === local.id).map((a) => a.localNoSite)).size > 1
+  if (!lista.length) {
+    const tinha = programacao.atividades.some((a) => a.local === local.id)
+    return <p className="aviso">{tinha ? 'Não há mais programação para este lugar.' : 'Ainda não há programação cadastrada para este lugar.'}</p>
+  }
   return (
     <div className="agenda">
       {dias.map((dia) => (
         <div key={dia}>
           <p className="agenda-dia">{dia === hoje ? 'Hoje' : DIAS[dia] || dia}</p>
           <ul>
-            {mostrar.filter((a) => a.dia === dia).map((a, i) => (
+            {lista.filter((a) => a.dia === dia).map((a, i) => (
               <li key={i}>
                 <span className="agenda-hora">{a.inicio ? (a.fim ? `${a.inicio}–${a.fim}` : a.inicio) : 'A definir'}</span>
                 <span className="agenda-texto">{varios && a.localNoSite && <em className="agenda-onde">{a.localNoSite}</em>}<strong>{a.titulo}</strong><small>{a.tipo}{a.com ? ` · ${a.com}` : ''}</small></span>
@@ -76,17 +78,18 @@ function Agenda({ local }) {
 // (pontos sem número, como a hidratação, mostram uma gota)
 function Numero({ local, grande }) {
   const dentro = local.dentro || local.id === dados.pavilhao
-  const gota = local.icone === 'agua'
+  // pontos de fora sem número (hidratação, Espaço Inovação) mostram o ícone
+  const icone = !local.numero && !local.dentro && local.icone
   return (
-    <span className={`numero${dentro ? ' numero-pav' : ''}${gota ? ' numero-agua' : ''}${grande ? ' numero-grande' : ''}`} aria-hidden="true">
-      {gota
-        ? <svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3c3 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 3-6.8 6-11zM9.5 14.5a2.5 2.5 0 0 0 2.5 2.5" /></svg>
+    <span className={`numero${dentro ? ' numero-pav' : ''}${local.icone === 'agua' ? ' numero-agua' : ''}${grande ? ' numero-grande' : ''}`} aria-hidden="true">
+      {icone
+        ? <svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d={ICONES[icone]} /></svg>
         : local.dentro ? pavilhao.numero : local.numero}
     </span>
   )
 }
 
-const ondeFica = (l) => (l.dentro ? `Dentro do Pavilhão (${pavilhao.numero})` : l.numero ? `Área externa · número ${l.numero}` : 'Área externa')
+const ondeFica = (l) => (l.dentro ? `Dentro do Pavilhão (${pavilhao.numero})` : l.numero ? `Área externa · número ${l.numero}` : l.junto ? `Área externa · no prédio do número ${l.junto}` : 'Área externa')
 
 export default function App() {
   const [escolhido, setEscolhido] = useState(null)

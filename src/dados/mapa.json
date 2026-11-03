@@ -18,18 +18,28 @@
   },
   {
    "numero": 2,
-   "id": "espaco-inovacao",
-   "nome": "Espaço Inovação",
-   "rotulo": "Espaço Inovação",
+   "id": "espaco-desafio",
+   "nome": "Espaço Desafio",
+   "rotulo": "Espaço Desafio",
    "x": 191,
    "y": 331,
    "no": "t2"
   },
   {
+   "id": "espaco-inovacao",
+   "nome": "Espaço Inovação",
+   "rotulo": "Espaço Inovação",
+   "icone": "inovacao",
+   "junto": 2,
+   "x": 118,
+   "y": 330,
+   "no": "t2"
+  },
+  {
    "numero": 3,
    "id": "espaco-da-descoberta",
-   "nome": "Espaço da Descoberta, Desafio e IA",
-   "rotulo": "Descoberta, Desafio e IA",
+   "nome": "Espaço da Descoberta e IA",
+   "rotulo": "Descoberta e IA",
    "x": 286,
    "y": 317,
    "no": "t4"

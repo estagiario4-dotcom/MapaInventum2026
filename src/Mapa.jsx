@@ -19,7 +19,9 @@ const [PX, PY, PW, PH] = PLANTA.contorno
 const internos = dados.locais.filter((l) => l.dentro && l.x != null)
 
 // ícones das atrações (24x24, traço branco)
-const ICONES = {
+export const ICONES = {
+  // Espaço Inovação: tela de palestra com gráfico subindo (palestras, oficina de startups, empreendedorismo)
+  inovacao: 'M3 4h18M4 4v11h16V4M12 15v3M8 21l4-3 4 3M8 12l3-3 2 2 3-3M14 8h2v2',
   agua: 'M12 3c3 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 3-6.8 6-11zM9.5 14.5a2.5 2.5 0 0 0 2.5 2.5',
   balao: 'M12 3a6 6 0 0 0-6 6c0 3.2 2.6 5.6 4 7h4c1.4-1.4 4-3.8 4-7a6 6 0 0 0-6-6zM12 3c-1.6 2-2 4.5-2 6s.6 4.6 2 7M12 3c1.6 2 2 4.5 2 6s-.6 4.6-2 7M10 16l.5 2.5M14 16l-.5 2.5M9.5 18.5h5v2.5h-5z',
   pato: 'M6 14c0 3.3 2.7 5 6 5s6-1.7 6-5c0-1.8-1.2-3-2.6-3.5A4 4 0 1 0 8 9c0 .9.3 1.6.7 2.2C7.1 11.8 6 12.8 6 14zM13.5 8h.01M15.8 8.6l3.2.9-3.2.9',
@@ -49,12 +51,15 @@ function Ponto({ l, px, cor, pulso }) {
   // a hidratação é um ponto menor, azul-claro
   const agua = l.icone === 'agua'
   cor = cor || (agua ? 'var(--agua)' : 'var(--numero)')
-  const s = px * (agua ? 0.72 : 1)
+  // lugar de fora com programação (ex.: Espaço Inovação): do mesmo tamanho das bolinhas com número
+  // impressas na imagem (cresce e diminui junto com o mapa)
+  const grande = !l.dentro && !agua
+  const s = grande ? 14.5 / 21 : px * (agua ? 0.72 : 1)
   return (
     <g className="sem-toque" transform={`translate(${p.x} ${p.y}) scale(${s})`}>
-      {pulso && <circle r="22" fill={cor} fillOpacity=".3" className="pulso" />}
-      <circle r="15" fill={cor} stroke="#fff" strokeWidth="3" className="ponto-sombra" />
-      <path d={ICONES[l.icone]} transform="translate(-9 -9) scale(.75)" className="ponto-icone" />
+      {pulso && <circle r={grande ? 26 : 22} fill={cor} fillOpacity=".3" className="pulso" />}
+      <circle r={grande ? 19 : 15} fill={cor} stroke="#fff" strokeWidth={grande ? 4 : 3} className={grande ? '' : 'ponto-sombra'} />
+      <path d={ICONES[l.icone]} transform={grande ? 'translate(-11 -11) scale(.92)' : 'translate(-9 -9) scale(.75)'} className="ponto-icone" />
     </g>
   )
 }
@@ -428,7 +433,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     }
     for (const l of extrasFora) {
       const t = naTela(l)
-      ocupado.push({ x1: t.x - 11, x2: t.x + 11, y1: t.y - 11, y2: t.y + 11 })
+      const r = l.icone === 'agua' ? 11 : 14.5 / px
+      ocupado.push({ x1: t.x - r, x2: t.x + r, y1: t.y - r, y2: t.y + r })
     }
     const ordem = [...numerados, ...extrasFora].filter((l) => !(aberto && dentroDaPlanta(l)))
       .sort((a, b) => (origem?.id === b.id) - (origem?.id === a.id) || a.numero - b.numero)
