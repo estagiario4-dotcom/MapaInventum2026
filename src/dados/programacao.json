@@ -7,7 +7,7 @@
       "fim": "20:10",
       "tipo": "Apresentação cultural",
       "titulo": "Abertura Inventum - Show LightWire",
-      "local": null,
+      "local": "exposicao-interna",
       "localNoSite": "Centro de Eventos"
     },
     {
@@ -347,8 +347,8 @@
       "fim": null,
       "tipo": "Palestra",
       "titulo": "Transmissão Simultânea - Palestra Sérgio Sacani",
-      "local": null,
-      "localNoSite": "Arena de Remate - Sociedade Rural",
+      "local": "espaco-desafio",
+      "localNoSite": "Espaço Desafio",
       "com": "Sérgio Sacani"
     },
     {

@@ -87,7 +87,7 @@ const Selo = () => (
   </svg>
 )
 
-const ondeFica = (l) => (l.dentro ? `Dentro do Pavilhão (${pavilhao.numero})` : l.numero ? `Área externa · número ${l.numero}` : l.junto ? `Área externa · no prédio do número ${l.junto}` : 'Área externa')
+const ondeFica = (l) => (l.dentro ? `Dentro do Pavilhão (${pavilhao.numero})` : l.id === dados.pavilhao ? `Pavilhão · número ${l.numero}` : l.numero ? `Área externa · número ${l.numero}` : l.junto ? `Área externa · no prédio do número ${l.junto}` : 'Área externa')
 
 export default function App() {
   const [escolhido, setEscolhido] = useState(null)
