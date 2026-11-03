@@ -23,6 +23,24 @@
     {
       "dia": "2026-11-05",
       "inicio": "08:00",
+      "fim": "10:00",
+      "tipo": "Palestra",
+      "titulo": "Licenciamento Ambiental e resposabilidade técnica - Area PB",
+      "local": "auditorio-cultura",
+      "localNoSite": "Mini Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "08:00",
+      "fim": "09:00",
+      "tipo": "Experiência",
+      "titulo": "Recepção Universidade Aberta à Pessoa Idosa (UNAPI)",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "08:00",
       "fim": "19:30",
       "tipo": "Robótica",
       "titulo": "Roboticalizando Sesi na Inventum",
@@ -37,24 +55,6 @@
       "titulo": "Você sabe usar IA",
       "local": "espaco-da-descoberta",
       "localNoSite": "Espaço da Inteligência Artificial"
-    },
-    {
-      "dia": "2026-11-05",
-      "inicio": "08:00",
-      "fim": "09:00",
-      "tipo": "Experiência",
-      "titulo": "Recepção Universidade Aberta à Pessoa Idosa (UNAPI)",
-      "local": "auditorio-cultura",
-      "localNoSite": "Auditório Cultura"
-    },
-    {
-      "dia": "2026-11-05",
-      "inicio": "08:00",
-      "fim": "10:00",
-      "tipo": "Palestra",
-      "titulo": "Licenciamento Ambiental e resposabilidade técnica - Area PB",
-      "local": "auditorio-cultura",
-      "localNoSite": "Mini Auditório Cultura"
     },
     {
       "dia": "2026-11-05",
@@ -131,6 +131,16 @@
     {
       "dia": "2026-11-05",
       "inicio": "14:00",
+      "fim": "15:30",
+      "tipo": "Palestra",
+      "titulo": "FoodTech com Sebrae",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups",
+      "com": "SEBRAE"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "14:00",
       "fim": "17:00",
       "tipo": "Palestra",
       "titulo": "Palestra IDR - Alimentação",
@@ -145,16 +155,6 @@
       "titulo": "Solenidade do Idoso",
       "local": "espaco-inovacao",
       "localNoSite": "Espaço Inovação"
-    },
-    {
-      "dia": "2026-11-05",
-      "inicio": "14:00",
-      "fim": null,
-      "tipo": "Palestra",
-      "titulo": "FoodTech com Sebrae",
-      "local": "pavilhao-palco-startup",
-      "localNoSite": "Palco Startups",
-      "com": "SEBRAE"
     },
     {
       "dia": "2026-11-05",
@@ -270,6 +270,16 @@
     {
       "dia": "2026-11-06",
       "inicio": "09:00",
+      "fim": "11:00",
+      "tipo": "Oficina",
+      "titulo": "Adequação à LGPD na era da Inteligência Artificial",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups",
+      "com": "Josiane Caldas"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "09:00",
       "fim": "12:00",
       "tipo": "Competição",
       "titulo": "Lançamento Balístico",
@@ -278,20 +288,10 @@
     },
     {
       "dia": "2026-11-06",
-      "inicio": "09:00",
-      "fim": "11:00",
-      "tipo": "Palestra",
-      "titulo": "Adequação à LGPD na era da Inteligência Artificial",
-      "local": "pavilhao-palco-startup",
-      "localNoSite": "Palco Startups",
-      "com": "Josiane Caldas"
-    },
-    {
-      "dia": "2026-11-06",
       "inicio": "13:00",
       "fim": "17:00",
-      "tipo": "Oficina",
-      "titulo": "Talk Comercial",
+      "tipo": "Palestra",
+      "titulo": "Mentoria à Mesa com ITECPB",
       "local": "pavilhao-palco-startup",
       "localNoSite": "Palco Startups"
     },
@@ -306,21 +306,21 @@
     },
     {
       "dia": "2026-11-06",
+      "inicio": "13:00",
+      "fim": "17:00",
+      "tipo": "Oficina",
+      "titulo": "Talk Comercial",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
+    },
+    {
+      "dia": "2026-11-06",
       "inicio": "13:30",
       "fim": "18:00",
       "tipo": "Palestra",
       "titulo": "Encontro CSC - Cidade Inteligentes",
       "local": "auditorio-cultura",
       "localNoSite": "Auditório Cultura"
-    },
-    {
-      "dia": "2026-11-06",
-      "inicio": "14:30",
-      "fim": null,
-      "tipo": "Palestra",
-      "titulo": "Mentoria à Mesa com ITECPB",
-      "local": "pavilhao-palco-startup",
-      "localNoSite": "Palco Startups"
     },
     {
       "dia": "2026-11-06",
@@ -339,6 +339,16 @@
       "titulo": "Será que estamos sozinhos?",
       "local": "espaco-inovacao",
       "localNoSite": "Espaço Inovação",
+      "com": "Sérgio Sacani"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "19:30",
+      "fim": null,
+      "tipo": "Palestra",
+      "titulo": "Transmissão Simultânea - Palestra Sérgio Sacani",
+      "local": null,
+      "localNoSite": "Arena de Remate - Sociedade Rural",
       "com": "Sérgio Sacani"
     },
     {
@@ -363,6 +373,16 @@
     {
       "dia": "2026-11-07",
       "inicio": "09:00",
+      "fim": "11:00",
+      "tipo": "Palestra",
+      "titulo": "Como a Reforma Tributária vai afetar o setor de tecnologia",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups",
+      "com": "Denise Pigosso"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "09:00",
       "fim": "20:00",
       "tipo": "Competição",
       "titulo": "Cubo Mágico",
@@ -377,25 +397,6 @@
       "titulo": "Feira de Iniciação Cientifíca da INVENTUM",
       "local": "espaco-patum",
       "localNoSite": "Espaço Patum"
-    },
-    {
-      "dia": "2026-11-07",
-      "inicio": "09:00",
-      "fim": null,
-      "tipo": "Palestra",
-      "titulo": "Como a Reforma Tributária vai afetar o setor de tecnologia",
-      "local": "pavilhao-palco-startup",
-      "localNoSite": "Palco Startups",
-      "com": "Denise Pigosso"
-    },
-    {
-      "dia": "2026-11-07",
-      "inicio": "09:00",
-      "fim": "11:00",
-      "tipo": "Competição",
-      "titulo": "Prêmio INVENTUM de Inovação",
-      "local": "auditorio-cultura",
-      "localNoSite": "Auditório Cultura"
     },
     {
       "dia": "2026-11-07",
@@ -418,6 +419,15 @@
     {
       "dia": "2026-11-07",
       "inicio": "13:00",
+      "fim": "17:30",
+      "tipo": "Apresentação cultural",
+      "titulo": "Concurso de Poesia SMEC",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "13:00",
       "fim": "18:00",
       "tipo": "Competição",
       "titulo": "Concurso de cosplay",
@@ -426,12 +436,12 @@
     },
     {
       "dia": "2026-11-07",
-      "inicio": "13:00",
+      "inicio": "13:30",
       "fim": "17:30",
-      "tipo": "Apresentação cultural",
-      "titulo": "Concurso de Poesia SMEC",
-      "local": "auditorio-cultura",
-      "localNoSite": "Auditório Cultura"
+      "tipo": "Palestra",
+      "titulo": "Mobilidade elétrica sem riscos: Instalação segura e especializada de carregadores",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
     },
     {
       "dia": "2026-11-07",
@@ -441,15 +451,6 @@
       "titulo": "Xadrez Digital",
       "local": "pavilhao-espaco-patotech",
       "localNoSite": "Espaço PatoTech"
-    },
-    {
-      "dia": "2026-11-07",
-      "inicio": "13:30",
-      "fim": null,
-      "tipo": "Palestra",
-      "titulo": "Mobilidade elétrica sem riscos: Instalação segura e especializada de carregadores",
-      "local": "pavilhao-palco-startup",
-      "localNoSite": "Palco Startups"
     },
     {
       "dia": "2026-11-07",
@@ -490,6 +491,15 @@
     },
     {
       "dia": "2026-11-07",
+      "inicio": "19:00",
+      "fim": "20:30",
+      "tipo": "Competição",
+      "titulo": "Prêmio INVENTUM de Inovação",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-07",
       "inicio": "19:30",
       "fim": "21:00",
       "tipo": "Oficina",
@@ -509,20 +519,20 @@
     {
       "dia": "2026-11-08",
       "inicio": "09:00",
-      "fim": "19:00",
-      "tipo": "Robótica",
-      "titulo": "Arena de Robótica",
-      "local": "pavilhao-arena-robotica",
-      "localNoSite": "Arena de Robótica"
-    },
-    {
-      "dia": "2026-11-08",
-      "inicio": "09:00",
       "fim": null,
       "tipo": "Competição",
       "titulo": "2ª Inventum Run",
       "local": "carreta-sesi",
       "localNoSite": "Carreta Palco SESI"
+    },
+    {
+      "dia": "2026-11-08",
+      "inicio": "09:00",
+      "fim": "19:00",
+      "tipo": "Robótica",
+      "titulo": "Arena de Robótica",
+      "local": "pavilhao-arena-robotica",
+      "localNoSite": "Arena de Robótica"
     },
     {
       "dia": "2026-11-08",
@@ -536,9 +546,9 @@
     {
       "dia": "2026-11-08",
       "inicio": "09:00",
-      "fim": null,
+      "fim": "12:00",
       "tipo": "Palestra",
-      "titulo": "O Engenheiro do Século: O poder das Soft Skills na carreira técnica",
+      "titulo": "O Engenheiro do Século XXI: O poder das Soft Skills na carreira técnica",
       "local": "pavilhao-palco-startup",
       "localNoSite": "Palco Startups"
     },
