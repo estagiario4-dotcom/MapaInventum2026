@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import dados from './dados/mapa.json'
 import { pontoDe } from './rota'
 import Mapa, { ICONES } from './Mapa'
-import programacao from './dados/programacao.json'
+import programacao, { atividadesDe, hojeISO, temProgramacao } from './programacao'
 import './App.css'
 
 const params = new URLSearchParams(window.location.search)
@@ -32,16 +32,6 @@ function visaoAbertura() {
   return { caixa: PATROCINADORES, depois: true }
 }
 
-const hojeISO = () => {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-// programação do evento (src/dados/programacao.json): atividades de cada lugar, em ordem de dia e hora
-// (dias que já passaram saem da lista, para não mostrar informação antiga)
-const atividadesDe = (local) => programacao.atividades
-  .filter((a) => a.local === local.id && a.dia >= hojeISO())
-  .sort((a, b) => (a.dia + (a.inicio || '99')).localeCompare(b.dia + (b.inicio || '99')))
 const DIAS = { '2026-11-04': 'Qua 04/11', '2026-11-05': 'Qui 05/11', '2026-11-06': 'Sex 06/11', '2026-11-07': 'Sáb 07/11', '2026-11-08': 'Dom 08/11' }
 
 function Agenda({ local }) {
@@ -88,6 +78,14 @@ function Numero({ local, grande }) {
     </span>
   )
 }
+
+// o selo de programação (o mesmo que aparece nos lugares do mapa)
+const Selo = () => (
+  <svg className="selo-mini" viewBox="-12 -12 24 24" aria-label="selo de programação" role="img">
+    <circle r="10.5" className="selo-fundo" />
+    <path d={ICONES.agenda} transform="translate(-6.5 -6.5) scale(.54)" className="selo-icone" />
+  </svg>
+)
 
 const ondeFica = (l) => (l.dentro ? `Dentro do Pavilhão (${pavilhao.numero})` : l.numero ? `Área externa · número ${l.numero}` : l.junto ? `Área externa · no prédio do número ${l.junto}` : 'Área externa')
 
@@ -164,7 +162,7 @@ export default function App() {
               <button role="tab" aria-selected={aba === 'dentro'} className={aba === 'dentro' ? 'ativo' : ''} onClick={() => setAba('dentro')}>Dentro do Pavilhão</button>
             </div>
             <ul className="lista lista-painel">
-              {(aba === 'fora' ? [...externos, ...extras] : internos).map((l) => <Linha key={l.id} local={l} />)}
+              {(aba === 'fora' ? [...externos, ...extras] : internos).filter(temProgramacao).map((l) => <Linha key={l.id} local={l} />)}
             </ul>
           </>
         ) : escolhido ? (
@@ -185,8 +183,8 @@ export default function App() {
           <>
             <p className="dica-uso">
               <span>
-                <strong>Toque no lugar onde deseja ver a programação.</strong>
-                <small>Toque no número ou no nome. Arraste o mapa; dois toques ou dois dedos aproximam.</small>
+                <strong>Toque nos lugares com <Selo /> para ver a programação.</strong>
+                <small>Arraste o mapa; dois toques ou dois dedos aproximam.</small>
               </span>
             </p>
             <div className="acoes">

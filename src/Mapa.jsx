@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import dados from './dados/mapa.json'
 import { pontoDe } from './rota'
+import { temProgramacao } from './programacao'
 // as imagens passam pelo build: ganham um nome com "impressão digital" e ficam guardadas no celular
 // (quem reabre o mapa não baixa de novo). Para trocar, substitua o arquivo em src/imagens/.
 import imgMapa from './imagens/mapa-inventum.webp'
@@ -20,6 +21,7 @@ const internos = dados.locais.filter((l) => l.dentro && l.x != null)
 
 // ícones das atrações (24x24, traço branco)
 export const ICONES = {
+  agenda: 'M4 6h16v14H4zM4 10h16M8 3v5M16 3v5M8 14h2M12 14h2M8 17h2',
   // Espaço Inovação: tela de palestra com gráfico subindo (palestras, oficina de startups, empreendedorismo)
   inovacao: 'M3 4h18M4 4v11h16V4M12 15v3M8 21l4-3 4 3M8 12l3-3 2 2 3-3M14 8h2v2',
   agua: 'M12 3c3 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 3-6.8 6-11zM9.5 14.5a2.5 2.5 0 0 0 2.5 2.5',
@@ -79,6 +81,17 @@ function Marcador({ p, px, cor, texto, pulso }) {
   )
 }
 
+// selo de programação: bolinha laranja com calendário, no canto de cima do número
+// (r: raio do selo; tudo em unidades do mapa)
+function Selo({ x, y, r }) {
+  return (
+    <g className="sem-toque" transform={`translate(${x} ${y}) scale(${r / 10.5})`}>
+      <circle r="10.5" className="selo-fundo" />
+      <path d={ICONES.agenda} transform="translate(-6.5 -6.5) scale(.54)" className="selo-icone" />
+    </g>
+  )
+}
+
 export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoLimpar, aoLimparOrigem, aoFimAbertura, editor }) {
   const caixa = useRef(null)
   const ponteiros = useRef(new Map())
@@ -107,6 +120,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     anim.current = requestAnimationFrame(passo)
   }
   const [clique, setClique] = useState(null)
+  // lugares com programação de hoje em diante (só eles têm selo e respondem ao toque)
+  const comProg = new Set(dados.locais.filter(temProgramacao).map((l) => l.id))
 
   useEffect(() => {
     const obs = new ResizeObserver(([e]) => setTam({ w: e.contentRect.width, h: e.contentRect.height }))
@@ -319,13 +334,13 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     const ponto = { x: vb.x + (p.x / tam.w) * vb.w, y: vb.y + (p.y / tam.h) * vb.h }
     if (editor) setClique({ x: Math.round(ponto.x), y: Math.round(ponto.y) })
     // toque num nome escolhe esse lugar
-    const nome = rotulosNaTela.current.find((r) => r.id && p.x >= r.x1 && p.x <= r.x2 && p.y >= r.y1 && p.y <= r.y2)
+    const nome = rotulosNaTela.current.find((r) => r.id && comProg.has(r.id) && p.x >= r.x1 && p.x <= r.x2 && p.y >= r.y1 && p.y <= r.y2)
     if (nome) return aoTocar(nome.id)
     // com o telhado aberto, o toque dentro do Pavilhão escolhe a atração tocada
     if (vb.w / tam.w <= limitePlanta() && dentroDaPlanta(ponto)) {
       const k = vb.w / tam.w
       let alvo = null
-      for (const l of internos) {
+      for (const l of internos.filter((l) => comProg.has(l.id))) {
         const d = Math.hypot(posPonto(l).x - ponto.x, posPonto(l).y - ponto.y)
         if (d < 22 * k && (!alvo || d < alvo.d)) alvo = { l, d }
       }
@@ -335,7 +350,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     // toque perto de um número escolhe esse lugar
     const raio = Math.max(26, 26 * (vb.w / tam.w))
     let perto = null
-    for (const l of dentroAberto ? [] : [...numerados, ...extrasFora]) {
+    for (const l of dentroAberto ? [] : [...numerados, ...extrasFora].filter((l) => comProg.has(l.id))) {
       const d = Math.hypot(l.x - ponto.x, l.y - ponto.y)
       if (d < raio && (!perto || d < perto.d)) perto = { l, d }
     }
@@ -372,6 +387,18 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     etiqueta = { x: Math.min(Math.max(t.x, 110), tam.w - 110), y: Math.max(t.y, (margem?.topo || 0) + 60) }
   }
 
+  // botão "Ver atrações por dentro": no centro do telhado do Pavilhão, só se couber inteiro na tela
+  // (no computador, sem ficar atrás do painel)
+  let botaoDentro = null
+  if (vb && !aberto && !rota) {
+    const t = naTela({ x: PX + PW / 2, y: PY + PH * 0.7 })
+    const r = { x1: t.x - 95, x2: t.x + 95, y1: t.y - 20, y2: t.y + 20 }
+    const pc = margem?.direita ? { x1: tam.w - margem.direita, y1: tam.h - (margem.alturaPainel || 0) } : null
+    const cabe = r.x1 >= 4 && r.x2 <= tam.w - 4 && r.y1 >= 4 && r.y2 <= tam.h - (margem?.baixo || 0) - 4
+      && !(pc && r.x2 > pc.x1 && r.y2 > pc.y1)
+    if (cabe) botaoDentro = { ...t, r }
+  }
+
   // nomes curtos ao lado de cada número, sem cobrir outros números nem outros nomes
   const rotulos = []
   if (vb) {
@@ -380,6 +407,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       const t = naTela(l)
       return { x1: t.x - R0, x2: t.x + R0, y1: t.y - R0, y2: t.y + R0 }
     })
+    if (botaoDentro) ocupado.push(botaoDentro.r)
     if (cOrigem && naVista(naTela(cOrigem))) {
       const t = naTela(cOrigem)
       const x = Math.min(Math.max(t.x, 80), tam.w - 80)
@@ -518,6 +546,25 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
             ? <Ponto l={origem} px={px} cor="var(--voce)" pulso />
             : <Marcador p={pOrigem} px={px} cor="var(--voce)" texto={numeroDe(origem)} pulso />)}
 
+          {/* selos de programação */}
+          {vb && (() => {
+            const rs = Math.max(6.7, 8 * px) // raio do selo (no mínimo 8 pixels na tela)
+            const lista = []
+            for (const l of [...numerados, ...extrasFora]) {
+              if (!comProg.has(l.id) || (aberto && dentroDaPlanta(l))) continue
+              // número impresso (raio 16) ou o número vermelho do escolhido, que é maior quando o mapa está afastado
+              const R = l.id === destino?.id ? Math.max(16, 19 * px) : l.numero ? 16 : 14.5
+              const d = R * 0.72 + rs * 0.3
+              lista.push(<Selo key={l.id} x={l.x + d} y={l.y - d} r={rs} />)
+            }
+            if (aberto) for (const l of internos) {
+              if (!comProg.has(l.id)) continue
+              const p = posPonto(l)
+              lista.push(<Selo key={l.id} x={p.x + 13 * px} y={p.y - 13 * px} r={8 * px} />)
+            }
+            return lista
+          })()}
+
           {editor && Object.entries(dados.nos).map(([id, n]) => (
             <g key={id}>
               <circle cx={n.x} cy={n.y} r={3 * px} fill="#ffeb3b" />
@@ -553,13 +600,10 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
 
       {/* dica: aproximar o Pavilhão para ver as atrações de dentro */}
       {vb && !aberto && !rota && (() => {
-        // fica no meio da parte do telhado que aparece na tela
-        const a = naTela({ x: PX, y: PY })
-        const b = naTela({ x: PX + PW, y: PY + PH })
-        const x1 = Math.max(a.x, 8), x2 = Math.min(b.x, tam.w - (margem?.direita || 0) - 8)
-        const y1 = Math.max(a.y, 8), y2 = Math.min(b.y, tam.h - (margem?.baixo || 0) - 8)
-        if (x2 - x1 < 90 || y2 - y1 < 36) return null
-        const t = { x: (x1 + x2) / 2, y: y1 + (y2 - y1) * 0.6 }
+        // fica sempre no centro do telhado (anda junto com o mapa, como os números);
+        // se o centro do telhado sair da tela, o botão some
+        if (!botaoDentro) return null
+        const t = botaoDentro
         return (
           <button className="ver-dentro" style={{ left: t.x, top: t.y }}
             onClick={() => abrirPavilhao()}>
