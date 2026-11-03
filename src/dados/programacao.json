@@ -1,0 +1,555 @@
+{
+  "fonte": "https://inventum.org.br/programacao (lido em 03/11/2026)",
+  "atividades": [
+    {
+      "dia": "2026-11-04",
+      "inicio": "20:00",
+      "fim": "20:10",
+      "tipo": "Apresentação cultural",
+      "titulo": "Abertura Inventum - Show LightWire",
+      "local": null,
+      "localNoSite": "Centro de Eventos"
+    },
+    {
+      "dia": "2026-11-04",
+      "inicio": "20:30",
+      "fim": "21:30",
+      "tipo": "Palestra",
+      "titulo": "Do nada, nasce tudo!",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura",
+      "com": "Rafael Liporace"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "08:00",
+      "fim": "19:30",
+      "tipo": "Robótica",
+      "titulo": "Roboticalizando Sesi na Inventum",
+      "local": "espaco-patum",
+      "localNoSite": "Espaço Patum"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "08:00",
+      "fim": "22:00",
+      "tipo": "Competição",
+      "titulo": "Você sabe usar IA",
+      "local": "espaco-da-descoberta",
+      "localNoSite": "Espaço da Inteligência Artificial"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "08:00",
+      "fim": "09:00",
+      "tipo": "Experiência",
+      "titulo": "Recepção Universidade Aberta à Pessoa Idosa (UNAPI)",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "08:00",
+      "fim": "10:00",
+      "tipo": "Palestra",
+      "titulo": "Licenciamento Ambiental e resposabilidade técnica - Area PB",
+      "local": "auditorio-cultura",
+      "localNoSite": "Mini Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "08:30",
+      "fim": "12:00",
+      "tipo": "Oficina",
+      "titulo": "Inovação Colaborativa, com Dyego Cantu e Rafael Caceres",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "09:00",
+      "fim": "12:00",
+      "tipo": "Competição",
+      "titulo": "AstroPB - Astro Tabuleiro",
+      "local": "espaco-da-descoberta",
+      "localNoSite": "Espaço Desafio"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "09:30",
+      "fim": "11:30",
+      "tipo": "Competição",
+      "titulo": "Hackathon de Letramento Digital",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "10:00",
+      "fim": "12:00",
+      "tipo": "Palestra",
+      "titulo": "O futuro que descartamos: residuos, inovação e responsabilidade compartilhada",
+      "local": "auditorio-cultura",
+      "localNoSite": "Mini Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "13:00",
+      "fim": "15:30",
+      "tipo": "Competição",
+      "titulo": "Pato Derivadas",
+      "local": "espaco-da-descoberta",
+      "localNoSite": "Espaço Desafio"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "14:00",
+      "fim": "18:00",
+      "tipo": "Competição",
+      "titulo": "AstroPB - Lançamento de Foguetes Didáticos",
+      "local": "espaco-astronomia",
+      "localNoSite": "Espaço Astronomia"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "14:00",
+      "fim": "22:00",
+      "tipo": "Competição",
+      "titulo": "Capture the Flag (CTF)",
+      "local": "pavilhao-espaco-patotech",
+      "localNoSite": "Espaço PatoTech"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "14:00",
+      "fim": "16:00",
+      "tipo": "Experiência",
+      "titulo": "Contação de histórias",
+      "local": "auditorio-cultura",
+      "localNoSite": "Mini Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "14:00",
+      "fim": "17:00",
+      "tipo": "Palestra",
+      "titulo": "Palestra IDR - Alimentação",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "14:00",
+      "fim": "15:00",
+      "tipo": "Palestra",
+      "titulo": "Solenidade do Idoso",
+      "local": "espaco-inovacao",
+      "localNoSite": "Espaço Inovação"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "14:00",
+      "fim": null,
+      "tipo": "Palestra",
+      "titulo": "FoodTech com Sebrae",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups",
+      "com": "SEBRAE"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "15:30",
+      "fim": "19:00",
+      "tipo": "Competição",
+      "titulo": "Ponte de Macarrão",
+      "local": "espaco-da-descoberta",
+      "localNoSite": "Espaço Desafio"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "17:00",
+      "fim": "19:00",
+      "tipo": "Palestra",
+      "titulo": "Rodada de Negócios com NEJ",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "18:00",
+      "fim": "21:00",
+      "tipo": "Oficina",
+      "titulo": "Oficina Intergeracionalidade",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "18:30",
+      "fim": "20:30",
+      "tipo": "Apresentação cultural",
+      "titulo": "Lançamento de livro e exposição \"Memórias da Imigração Italiana\" autor M.V.Bortolli",
+      "local": "auditorio-cultura",
+      "localNoSite": "Mini Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "19:30",
+      "fim": null,
+      "tipo": "Palestra",
+      "titulo": "Inovação em Medicina, o futuro é agora.",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups",
+      "com": "Manoel Guimarães"
+    },
+    {
+      "dia": "2026-11-05",
+      "inicio": "20:30",
+      "fim": null,
+      "tipo": "Palestra",
+      "titulo": "A Engenharia do Impossível da Construção Civil ao Coração Humano",
+      "local": "espaco-inovacao",
+      "localNoSite": "Espaço Inovação",
+      "com": "Paulo Cesar Duarte Junior"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "08:00",
+      "fim": "22:00",
+      "tipo": "Robótica",
+      "titulo": "Arena de Robótica",
+      "local": "pavilhao-arena-robotica",
+      "localNoSite": "Arena de Robótica"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "08:00",
+      "fim": "12:00",
+      "tipo": "Robótica",
+      "titulo": "Roboticalizando Sesi na Inventum",
+      "local": "espaco-patum",
+      "localNoSite": "Espaço Patum"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "08:00",
+      "fim": "22:00",
+      "tipo": "Competição",
+      "titulo": "Você sabe usar IA",
+      "local": "espaco-da-descoberta",
+      "localNoSite": "Espaço da Inteligência Artificial"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "08:30",
+      "fim": "10:30",
+      "tipo": "Outro",
+      "titulo": "Comportamento Empreendedor - Sebrae",
+      "local": "pavilhao-espaco-patotech",
+      "localNoSite": "Espaço PatoTech"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "08:30",
+      "fim": "12:00",
+      "tipo": "Outro",
+      "titulo": "Fórum SRI Sudoeste",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "08:30",
+      "fim": "11:00",
+      "tipo": "Oficina",
+      "titulo": "Inova Startups - Sebrae",
+      "local": "espaco-inovacao",
+      "localNoSite": "Espaço Inovação",
+      "com": "SEBRAE"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "09:00",
+      "fim": "12:00",
+      "tipo": "Competição",
+      "titulo": "Lançamento Balístico",
+      "local": "espaco-astronomia",
+      "localNoSite": "Espaço Astronomia"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "09:00",
+      "fim": "11:00",
+      "tipo": "Palestra",
+      "titulo": "Adequação à LGPD na era da Inteligência Artificial",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups",
+      "com": "Josiane Caldas"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "13:00",
+      "fim": "17:00",
+      "tipo": "Oficina",
+      "titulo": "Talk Comercial",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "13:00",
+      "fim": "17:00",
+      "tipo": "Palestra",
+      "titulo": "Olhares que protegem uma Pato Branco amiga da pessoa Idosa",
+      "local": "espaco-da-descoberta",
+      "localNoSite": "Espaço Desafio"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "13:30",
+      "fim": "18:00",
+      "tipo": "Palestra",
+      "titulo": "Encontro CSC - Cidade Inteligentes",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "14:30",
+      "fim": null,
+      "tipo": "Palestra",
+      "titulo": "Mentoria à Mesa com ITECPB",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "19:00",
+      "fim": null,
+      "tipo": "Experiência",
+      "titulo": "ConectaAção com ACEPB",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "19:30",
+      "fim": null,
+      "tipo": "Palestra",
+      "titulo": "Será que estamos sozinhos?",
+      "local": "espaco-inovacao",
+      "localNoSite": "Espaço Inovação",
+      "com": "Sérgio Sacani"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "08:00",
+      "fim": "12:00",
+      "tipo": "Palestra",
+      "titulo": "Elas são Tech",
+      "local": "espaco-inovacao",
+      "localNoSite": "Espaço Inovação",
+      "com": "Rozimery Ferreira, Elizandra Machado, Cassiana Gorrosterrazu, Jaqueline Ruffato, Ivânia Ramos, Rosiclei Caldato Dalagnol, Bruna, Cristina Gabriela Ascari Kuhn"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "09:00",
+      "fim": "22:00",
+      "tipo": "Robótica",
+      "titulo": "Arena de Robótica",
+      "local": "pavilhao-arena-robotica",
+      "localNoSite": "Arena de Robótica"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "09:00",
+      "fim": "20:00",
+      "tipo": "Competição",
+      "titulo": "Cubo Mágico",
+      "local": "espaco-da-descoberta",
+      "localNoSite": "Espaço Desafio"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "09:00",
+      "fim": "19:00",
+      "tipo": "Competição",
+      "titulo": "Feira de Iniciação Cientifíca da INVENTUM",
+      "local": "espaco-patum",
+      "localNoSite": "Espaço Patum"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "09:00",
+      "fim": null,
+      "tipo": "Palestra",
+      "titulo": "Como a Reforma Tributária vai afetar o setor de tecnologia",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups",
+      "com": "Denise Pigosso"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "09:00",
+      "fim": "11:00",
+      "tipo": "Competição",
+      "titulo": "Prêmio INVENTUM de Inovação",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "09:00",
+      "fim": null,
+      "tipo": "Oficina",
+      "titulo": "OAB - IA na Prática",
+      "local": "pavilhao-espaco-patotech",
+      "localNoSite": "Espaço PatoTech"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "12:00",
+      "fim": null,
+      "tipo": "Competição",
+      "titulo": "AstroPB - Mostra de Foguetes",
+      "local": "espaco-astronomia",
+      "localNoSite": "Espaço Astronomia"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "13:00",
+      "fim": "18:00",
+      "tipo": "Competição",
+      "titulo": "Concurso de cosplay",
+      "local": null,
+      "localNoSite": null
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "13:00",
+      "fim": "17:30",
+      "tipo": "Apresentação cultural",
+      "titulo": "Concurso de Poesia SMEC",
+      "local": "auditorio-cultura",
+      "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "13:30",
+      "fim": "19:00",
+      "tipo": "Competição",
+      "titulo": "Xadrez Digital",
+      "local": "pavilhao-espaco-patotech",
+      "localNoSite": "Espaço PatoTech"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "13:30",
+      "fim": null,
+      "tipo": "Palestra",
+      "titulo": "Mobilidade elétrica sem riscos: Instalação segura e especializada de carregadores",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "15:00",
+      "fim": "17:00",
+      "tipo": "Competição",
+      "titulo": "Nautimodelismo",
+      "local": "nautimodelismo",
+      "localNoSite": "Espaço Inventores"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "15:30",
+      "fim": "22:00",
+      "tipo": "Competição",
+      "titulo": "UTFPR In Concert",
+      "local": "carreta-sesi",
+      "localNoSite": "Carreta Palco SESI"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "16:00",
+      "fim": "22:00",
+      "tipo": "Palestra",
+      "titulo": "Atlas Day - Empreendedorismo e Inovação e Produtividade na Era Digital",
+      "local": "espaco-inovacao",
+      "localNoSite": "Espaço Inovação",
+      "com": "Renato Xavier, Denny Mews"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "18:00",
+      "fim": "22:00",
+      "tipo": "Palestra",
+      "titulo": "Pavimentação sustentável : pavimento de concreto",
+      "local": "auditorio-cultura",
+      "localNoSite": "Mini Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": "19:30",
+      "fim": "21:00",
+      "tipo": "Oficina",
+      "titulo": "Mini workshop de Marketing",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
+    },
+    {
+      "dia": "2026-11-07",
+      "inicio": null,
+      "fim": null,
+      "tipo": "Outro",
+      "titulo": "Espaço da Ciência - Escolas",
+      "local": "espaco-inovacao",
+      "localNoSite": "Espaço Inovação"
+    },
+    {
+      "dia": "2026-11-08",
+      "inicio": "09:00",
+      "fim": "19:00",
+      "tipo": "Robótica",
+      "titulo": "Arena de Robótica",
+      "local": "pavilhao-arena-robotica",
+      "localNoSite": "Arena de Robótica"
+    },
+    {
+      "dia": "2026-11-08",
+      "inicio": "09:00",
+      "fim": null,
+      "tipo": "Competição",
+      "titulo": "2ª Inventum Run",
+      "local": "carreta-sesi",
+      "localNoSite": "Carreta Palco SESI"
+    },
+    {
+      "dia": "2026-11-08",
+      "inicio": "09:00",
+      "fim": "18:00",
+      "tipo": "Competição",
+      "titulo": "Corrida Maluca",
+      "local": "corrida-maluca",
+      "localNoSite": "Espaço Inventores"
+    },
+    {
+      "dia": "2026-11-08",
+      "inicio": "09:00",
+      "fim": null,
+      "tipo": "Palestra",
+      "titulo": "O Engenheiro do Século: O poder das Soft Skills na carreira técnica",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
+    },
+    {
+      "dia": "2026-11-08",
+      "inicio": null,
+      "fim": null,
+      "tipo": "Outro",
+      "titulo": "Espaço da Ciência - Escolas",
+      "local": "espaco-inovacao",
+      "localNoSite": "Espaço Inovação"
+    }
+  ]
+}

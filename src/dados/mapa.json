@@ -134,6 +134,15 @@
    "no": "s3"
   },
   {
+   "id": "hidratacao-patum",
+   "nome": "Ponto de Hidratação",
+   "rotulo": "Hidratação",
+   "icone": "agua",
+   "x": 757,
+   "y": 414,
+   "no": "s3"
+  },
+  {
    "numero": 15,
    "id": "espaco-idr",
    "nome": "Espaço IDR",
@@ -216,17 +225,17 @@
    }
   },
   {
-   "id": "pavilhao-foto-ia",
-   "nome": "Foto IA",
-   "rotulo": "Foto IA",
-   "icone": "foto",
+   "id": "pavilhao-hidratacao",
+   "nome": "Ponto de Hidratação",
+   "rotulo": "Hidratação",
+   "icone": "agua",
    "dentro": true,
-   "x": 906.5,
-   "y": 322.0,
+   "x": 906.4,
+   "y": 322.7,
    "no": "pv4",
    "ponto": {
     "x": 906.4,
-    "y": 312.1
+    "y": 318.5
    }
   },
   {

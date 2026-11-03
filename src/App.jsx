@@ -1,31 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import dados from './dados/mapa.json'
-import { montarGrafo, calcularRota, pontoDe } from './rota'
+import { pontoDe } from './rota'
 import Mapa from './Mapa'
+import programacao from './dados/programacao.json'
 import './App.css'
 
-const grafo = montarGrafo(dados)
 const params = new URLSearchParams(window.location.search)
 const editor = params.has('editor')
 
 const buscarLocal = (id) => dados.locais.find((l) => l.id === id)
 const pavilhao = buscarLocal(dados.pavilhao)
 const externos = dados.locais.filter((l) => l.numero).sort((a, b) => a.numero - b.numero)
+// pontos de fora sem número (ex.: hidratação)
+const extras = dados.locais.filter((l) => !l.numero && !l.dentro)
 const internos = dados.locais.filter((l) => l.dentro).sort((a, b) => a.nome.localeCompare(b.nome))
-
-// tempo a pé (andando devagar, no meio do evento)
-function tempoAPe(metros) {
-  return `${Math.max(1, Math.round(metros / 60))} min a pé`
-}
-
-// caixa em volta de alguns pontos (para enquadrar a rota)
-function caixaEmVolta(pts) {
-  const xs = pts.map((p) => p.x)
-  const ys = pts.map((p) => p.y)
-  const x = Math.min(...xs)
-  const y = Math.min(...ys)
-  return { x: x - 30, y: y - 30, w: Math.max(Math.max(...xs) - x, 200) + 60, h: Math.max(Math.max(...ys) - y, 120) + 60 }
-}
 
 // visão perto de onde a pessoa está (ou na área dos estandes)
 function visaoPerto(local) {
@@ -35,132 +23,113 @@ function visaoPerto(local) {
   return { caixa: { x: c.x - w / 2, y: c.y - w * 0.375, w, h: w * 0.75 } }
 }
 
-// bolinha com o número (igual à do mapa); lugares do Pavilhão mostram o 18 em vermelho
+// Ao abrir o mapa os patrocinadores aparecem sem nada por cima:
+// no computador, o mapa em tela cheia (painel à direita); no celular, o quadro dos patrocinadores.
+const PATROCINADORES = { x: 20, y: 530, w: 500, h: 250 }
+const celular = () => window.innerWidth < 700
+function visaoAbertura() {
+  if (!celular()) return { inteiro: true }
+  return { caixa: PATROCINADORES, depois: true }
+}
+
+// programação do evento (src/dados/programacao.json): atividades de cada lugar, em ordem de dia e hora
+const atividadesDe = (local) => programacao.atividades
+  .filter((a) => a.local === local.id)
+  .sort((a, b) => (a.dia + (a.inicio || '99')).localeCompare(b.dia + (b.inicio || '99')))
+const DIAS = { '2026-11-04': 'Qua 04/11', '2026-11-05': 'Qui 05/11', '2026-11-06': 'Sex 06/11', '2026-11-07': 'Sáb 07/11', '2026-11-08': 'Dom 08/11' }
+const hojeISO = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function Agenda({ local }) {
+  const lista = atividadesDe(local)
+  const hoje = hojeISO()
+  // durante a feira, mostra de hoje em diante; antes, mostra tudo
+  const proximas = lista.filter((a) => a.dia >= hoje)
+  const mostrar = proximas.length ? proximas : lista
+  const dias = [...new Set(mostrar.map((a) => a.dia))]
+  // quando o número junta mais de um espaço (ex.: Auditório e Mini Auditório), mostra em qual é cada atividade
+  const varios = new Set(lista.map((a) => a.localNoSite)).size > 1
+  if (!lista.length) return <p className="aviso">Ainda não há programação cadastrada para este lugar.</p>
+  return (
+    <div className="agenda">
+      {dias.map((dia) => (
+        <div key={dia}>
+          <p className="agenda-dia">{dia === hoje ? 'Hoje' : DIAS[dia] || dia}</p>
+          <ul>
+            {mostrar.filter((a) => a.dia === dia).map((a, i) => (
+              <li key={i}>
+                <span className="agenda-hora">{a.inicio ? (a.fim ? `${a.inicio}–${a.fim}` : a.inicio) : 'A definir'}</span>
+                <span className="agenda-texto">{varios && a.localNoSite && <em className="agenda-onde">{a.localNoSite}</em>}<strong>{a.titulo}</strong><small>{a.tipo}{a.com ? ` · ${a.com}` : ''}</small></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <a className="agenda-site" href="https://inventum.org.br/programacao" target="_blank" rel="noreferrer">Programação completa e inscrições</a>
+    </div>
+  )
+}
+
+// bolinha com o número (igual à do mapa); lugares do Pavilhão mostram o número do Pavilhão em vermelho
+// (pontos sem número, como a hidratação, mostram uma gota)
 function Numero({ local, grande }) {
   const dentro = local.dentro || local.id === dados.pavilhao
+  const gota = local.icone === 'agua'
   return (
-    <span className={`numero${dentro ? ' numero-pav' : ''}${grande ? ' numero-grande' : ''}`} aria-hidden="true">
-      {local.dentro ? pavilhao.numero : local.numero}
+    <span className={`numero${dentro ? ' numero-pav' : ''}${gota ? ' numero-agua' : ''}${grande ? ' numero-grande' : ''}`} aria-hidden="true">
+      {gota
+        ? <svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3c3 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 3-6.8 6-11zM9.5 14.5a2.5 2.5 0 0 0 2.5 2.5" /></svg>
+        : local.dentro ? pavilhao.numero : local.numero}
     </span>
   )
 }
 
-const ondeFica = (l) => (l.dentro ? `Dentro do Pavilhão (${pavilhao.numero})` : `Área externa · número ${l.numero}`)
+const ondeFica = (l) => (l.dentro ? `Dentro do Pavilhão (${pavilhao.numero})` : l.numero ? `Área externa · número ${l.numero}` : 'Área externa')
 
 export default function App() {
-  const [origem, setOrigem] = useState(() => buscarLocal(params.get('aqui')))
-  const [destino, setDestino] = useState(null)
+  const [escolhido, setEscolhido] = useState(null)
   const [lista, setLista] = useState(false)
-  const [passos, setPassos] = useState(false)
   const [aba, setAba] = useState('fora')
-  const [foco, setFoco] = useState(() => visaoPerto(buscarLocal(params.get('aqui'))))
+  const [foco, setFoco] = useState(visaoAbertura)
   const [margem, setMargem] = useState({ topo: 0, baixo: 0 })
   const painelRef = useRef(null)
 
   // mede o painel para o mapa não ficar escondido atrás dele
   useEffect(() => {
     const medir = () => setMargem(window.innerWidth >= 700
-      ? { topo: 0, baixo: 0, esquerda: painelRef.current.offsetWidth + 24 }
+      ? { topo: 0, baixo: 0, direita: painelRef.current.offsetWidth + 24, alturaPainel: painelRef.current.offsetHeight + 24 }
       : { topo: 0, baixo: painelRef.current.offsetHeight })
     const obs = new ResizeObserver(medir)
     obs.observe(painelRef.current)
     return () => obs.disconnect()
   }, [])
 
-  const rota = origem && destino ? calcularRota(dados, grafo, origem, destino) : null
-  const caixaDaRota = (o, d, r) => ({ caixa: caixaEmVolta([pontoDe(dados, o), pontoDe(dados, d), ...r.pontos]), manter: pontoDe(dados, o) })
-
-  function limparOrigem() {
-    setOrigem(null)
-    setDestino(null)
-  }
-
-  // toque num lugar: sem origem, vira "você está aqui"; com origem, vira o destino.
-  // Tocar de novo no mesmo lugar desmarca.
-  // "daLista": veio da lista (enquadra com zoom); do mapa só arrasta, sem mudar o zoom
+  // toque num lugar: mostra a programação dele. Tocar de novo no mesmo lugar desmarca.
+  // "daLista": veio da lista (leva o mapa até o lugar); do mapa, o mapa fica onde está
   function escolher(local, daLista) {
     setLista(false)
-    if (origem && local.id === origem.id) return limparOrigem()
-    if (destino && local.id === destino.id) return setDestino(null)
-    if (!origem) {
-      setOrigem(local)
-      if (daLista) setFoco(visaoPerto(local))
-      return
-    }
-    setDestino(local)
-    setPassos(false)
-    const r = calcularRota(dados, grafo, origem, local)
-    // tocou no mapa: só arrasta, mantendo à vista o lugar tocado; da lista: enquadra a partir de onde a pessoa está
-    // tocando no mapa: o mapa fica onde está (só arrasta se o lugar ficar atrás do painel);
-    // pela lista: leva o mapa até o lugar escolhido (atrações de dentro já com o telhado aberto)
-    if (!r) return
+    if (escolhido && local.id === escolhido.id) return setEscolhido(null)
+    setEscolhido(local)
     const alvo = local.ponto || pontoDe(dados, local)
-    if (!daLista) setFoco({ caixa: caixaDaRota(origem, local, r).caixa, manter: alvo, soManter: true })
+    if (!daLista) setFoco({ caixa: { x: alvo.x - 1, y: alvo.y - 1, w: 2, h: 2 }, manter: alvo, soManter: true })
     else if (local.dentro && local.x != null) setFoco({ pavilhao: true, centro: alvo })
     else setFoco({ caixa: { x: alvo.x - 130, y: alvo.y - 100, w: 260, h: 200 }, manter: alvo })
   }
 
   function Linha({ local }) {
-    const eOrigem = origem && local.id === origem.id
+    const n = atividadesDe(local).length
     return (
       <li>
-        <button onClick={() => escolher(local, true)} disabled={eOrigem}>
+        <button onClick={() => escolher(local, true)}>
           <Numero local={local} />
           <span className="linha-texto">
             <span>{local.nome}</span>
-            <small>{eOrigem ? 'Você está aqui' : ondeFica(local)}</small>
+            <small>{ondeFica(local)}{n ? ` · ${n} atividade${n > 1 ? 's' : ''}` : ''}</small>
           </span>
         </button>
       </li>
-    )
-  }
-
-  // passo a passo da rota
-  function Passos() {
-    if (origem.dentro && destino.dentro) {
-      return (
-        <ol className="passos">
-          <li><span>Saia de <strong>{origem.nome}</strong></span></li>
-          <li><span>Siga a linha azul pelos corredores do Pavilhão</span></li>
-          <li><span>{destino.x != null ? <>Chegue em <strong>{destino.nome}</strong></> : <><strong>{destino.nome}</strong> ficam espalhados pelo Pavilhão</>}</span></li>
-        </ol>
-      )
-    }
-    const itens = []
-    itens.push(origem.dentro
-      ? <>Saia {origem.x != null ? <>de <strong>{origem.nome}</strong> e siga a linha até a entrada lateral do </> : 'pela entrada lateral do '}<Numero local={pavilhao} /> <strong>Pavilhão</strong></>
-      : <>Saia de <Numero local={origem} /> <strong>{origem.nome}</strong></>)
-    if (rota.pontos.length > 1) {
-      // passos na ordem do caminho: grupos de lugares e, se for o caso, a travessia do Pavilhão
-      const lista = (ls) => ls.slice(0, 4).map((l, i, t) => (
-        <span key={l.id}><Numero local={l} /> {l.nome}{i < t.length - 2 ? ', ' : i === t.length - 2 ? ' e ' : ''}</span>
-      ))
-      let grupo = []
-      let algum = false
-      const fechar = () => {
-        if (grupo.length) itens.push(<>{algum ? 'Continue pela' : 'Siga a'} linha azul passando por {lista(grupo)}</>)
-        if (grupo.length) algum = true
-        grupo = []
-      }
-      for (const t of rota.trechos) {
-        if (t.pavilhao) {
-          fechar()
-          itens.push(<>Entre pela lateral do <Numero local={pavilhao} /> <strong>Pavilhão</strong>, atravesse por dentro (passando pelas atrações) e saia pela outra lateral</>)
-          algum = true
-        } else grupo.push(t.local)
-      }
-      fechar()
-      if (!algum) itens.push(<>Siga a linha azul</>)
-    }
-    itens.push(destino.dentro
-      ? (destino.x != null
-          ? <>Entre no <Numero local={pavilhao} /> <strong>Pavilhão</strong> e siga a linha pelos corredores até <strong>{destino.nome}</strong></>
-          : <>Entre no <Numero local={pavilhao} /> <strong>Pavilhão</strong>. <strong>{destino.nome}</strong> fica lá dentro</>)
-      : <>Chegue em <Numero local={destino} /> <strong>{destino.nome}</strong></>)
-    return (
-      <ol className="passos">
-        {itens.map((p, i) => <li key={i}><span>{p}</span></li>)}
-      </ol>
     )
   }
 
@@ -169,33 +138,22 @@ export default function App() {
       <Mapa
         foco={foco}
         margem={margem}
-        rota={rota}
-        origem={origem}
-        destino={destino}
+        rota={null}
+        origem={null}
+        destino={escolhido}
         aoTocar={(id) => escolher(buscarLocal(id), false)}
-        aoLimpar={() => setDestino(null)}
-        aoLimparOrigem={limparOrigem}
+        aoLimpar={() => setEscolhido(null)}
+        aoLimparOrigem={() => {}}
+        aoFimAbertura={() => {}}
         editor={editor}
       />
 
-      {/* botão para voltar o mapa para onde a pessoa está */}
-      {origem && (
-        <button className="onde-estou" style={{ bottom: margem.baixo + 12 }} aria-label="Mostrar onde estou"
-          onClick={() => setFoco(rota ? caixaDaRota(origem, destino, rota) : visaoPerto(origem))}>
-          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-            <circle cx="12" cy="12" r="4" fill="currentColor" />
-            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="2" />
-            <path d="M12 1v3M12 20v3M1 12h3M20 12h3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </button>
-      )}
-
-      {/* painel de baixo (com a dica do que fazer) */}
+      {/* painel de baixo */}
       <section className={`painel${lista ? ' aberto' : ''}`} ref={painelRef}>
         {lista ? (
           <>
             <div className="linha-topo">
-              <h1>{origem ? 'Para onde você quer ir?' : 'Onde você está?'}</h1>
+              <h1>Ver a programação de</h1>
               <button className="fechar" aria-label="Fechar lista" onClick={() => setLista(false)}>×</button>
             </div>
             <div className="abas" role="tablist">
@@ -203,38 +161,29 @@ export default function App() {
               <button role="tab" aria-selected={aba === 'dentro'} className={aba === 'dentro' ? 'ativo' : ''} onClick={() => setAba('dentro')}>Dentro do Pavilhão</button>
             </div>
             <ul className="lista lista-painel">
-              {(aba === 'fora' ? externos : internos).map((l) => <Linha key={l.id} local={l} />)}
+              {(aba === 'fora' ? [...externos, ...extras] : internos).map((l) => <Linha key={l.id} local={l} />)}
             </ul>
           </>
-        ) : rota ? (
+        ) : escolhido ? (
           <>
             <div className="linha-topo">
-              <Numero local={destino} grande />
+              <Numero local={escolhido} grande />
               <div className="destino-texto">
-                <h1>{destino.nome}</h1>
-                <p className="apoio">{tempoAPe(rota.metros)} · siga a linha azul</p>
+                <h1>{escolhido.nome}</h1>
+                <p className="apoio">{ondeFica(escolhido)}</p>
               </div>
-              <button className="fechar" aria-label="Desmarcar destino" onClick={() => setDestino(null)}>×</button>
+              <button className="fechar" aria-label="Fechar" onClick={() => setEscolhido(null)}>×</button>
             </div>
-            {passos && <Passos />}
-            <button className="link" aria-expanded={passos} onClick={() => setPassos(!passos)}>
-              {passos ? 'Esconder o passo a passo' : 'Ver o passo a passo'}
-            </button>
+            {escolhido.icone === 'agua'
+              ? <p className="aviso">Ponto de hidratação.</p>
+              : <Agenda local={escolhido} />}
           </>
         ) : (
           <>
-            {origem && (
-              <div className="linha-topo voce">
-                <span className="ponto" />
-                <p>Você está em <Numero local={origem} /> <strong>{origem.nome}</strong></p>
-                <button className="fechar pequeno" aria-label="Desmarcar onde você está" onClick={limparOrigem}>×</button>
-              </div>
-            )}
             <p className="dica-uso">
-              <span className="dica-passo">{origem ? '2 de 2' : '1 de 2'}</span>
               <span>
-                <strong>{origem ? 'Toque no número para onde você quer ir.' : 'Toque no número do lugar onde você está.'}</strong>
-                <small>{origem ? 'Toque no número ou no nome do lugar. Dois toques no mapa aproximam.' : 'Arraste o mapa. Dois toques ou dois dedos aproximam.'}</small>
+                <strong>Toque no lugar onde deseja ver a programação.</strong>
+                <small>Toque no número ou no nome. Arraste o mapa; dois toques ou dois dedos aproximam.</small>
               </span>
             </p>
             <div className="acoes">

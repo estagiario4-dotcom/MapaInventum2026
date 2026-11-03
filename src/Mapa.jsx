@@ -9,6 +9,8 @@ import imgPavilhao from './imagens/pavilhao-dentro.webp'
 const IMG = dados.imagem
 export const MAPA_INTEIRO = { x: 0, y: 0, w: IMG.largura, h: IMG.altura }
 const numerados = dados.locais.filter((l) => l.numero)
+// pontos de fora sem número (ex.: hidratação): bolinha pequena com ícone
+const extrasFora = dados.locais.filter((l) => !l.numero && !l.dentro && l.icone)
 // dentro do Pavilhão: com o mapa aproximado, o telhado fica "transparente" e mostra
 // os corredores e as atrações (no mesmo estilo dos pontos de fora)
 const PLANTA = dados.planta
@@ -18,6 +20,7 @@ const internos = dados.locais.filter((l) => l.dentro && l.x != null)
 
 // ícones das atrações (24x24, traço branco)
 const ICONES = {
+  agua: 'M12 3c3 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 3-6.8 6-11zM9.5 14.5a2.5 2.5 0 0 0 2.5 2.5',
   balao: 'M12 3a6 6 0 0 0-6 6c0 3.2 2.6 5.6 4 7h4c1.4-1.4 4-3.8 4-7a6 6 0 0 0-6-6zM12 3c-1.6 2-2 4.5-2 6s.6 4.6 2 7M12 3c1.6 2 2 4.5 2 6s-.6 4.6-2 7M10 16l.5 2.5M14 16l-.5 2.5M9.5 18.5h5v2.5h-5z',
   pato: 'M6 14c0 3.3 2.7 5 6 5s6-1.7 6-5c0-1.8-1.2-3-2.6-3.5A4 4 0 1 0 8 9c0 .9.3 1.6.7 2.2C7.1 11.8 6 12.8 6 14zM13.5 8h.01M15.8 8.6l3.2.9-3.2.9',
   foto: 'M4 8h3l2-3h6l2 3h3v11H4zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z',
@@ -41,10 +44,14 @@ const ICONES = {
 // ponto de uma atração de dentro: bolinha igual às de fora, com ícone no lugar do número
 // (o ponto fica na parte de trás do espaço, para não cobrir o desenho 3D)
 const posPonto = (l) => l.ponto || l
-function Ponto({ l, px, cor = 'var(--numero)', pulso }) {
+function Ponto({ l, px, cor, pulso }) {
   const p = posPonto(l)
+  // a hidratação é um ponto menor, azul-claro
+  const agua = l.icone === 'agua'
+  cor = cor || (agua ? 'var(--agua)' : 'var(--numero)')
+  const s = px * (agua ? 0.72 : 1)
   return (
-    <g className="sem-toque" transform={`translate(${p.x} ${p.y}) scale(${px})`}>
+    <g className="sem-toque" transform={`translate(${p.x} ${p.y}) scale(${s})`}>
       {pulso && <circle r="22" fill={cor} fillOpacity=".3" className="pulso" />}
       <circle r="15" fill={cor} stroke="#fff" strokeWidth="3" className="ponto-sombra" />
       <path d={ICONES[l.icone]} transform="translate(-9 -9) scale(.75)" className="ponto-icone" />
@@ -67,7 +74,7 @@ function Marcador({ p, px, cor, texto, pulso }) {
   )
 }
 
-export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoLimpar, aoLimparOrigem, editor }) {
+export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoLimpar, aoLimparOrigem, aoFimAbertura, editor }) {
   const caixa = useRef(null)
   const ponteiros = useRef(new Map())
   const gesto = useRef(null)
@@ -110,7 +117,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     // proteção: nunca aceita um enquadramento inválido (o mapa travaria)
     if (![v.x, v.y, v.w, v.h].every(Number.isFinite)) return vbAtual.current || { x: 0, y: 0, w: IMG.largura, h: IMG.altura }
     // (uma rota longa pode afastar mais, até a largura toda, para caber inteira no celular)
-    const maxW = IMG.largura
+    // (na abertura do computador o mapa inteiro fica acima do painel, por isso pode ser um pouco maior)
+    const maxW = IMG.largura * 1.6
     const cx = v.x + v.w / 2
     const cy = v.y + v.h / 2
     // zoom máximo: no máximo 5 pixels de tela por unidade (a imagem não fica borrada)
@@ -119,11 +127,12 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     const k = w / tam.w
     const topo = (margem?.topo || 0) * k
     const baixo = (margem?.baixo || 0) * k
-    const esquerda = (margem?.esquerda || 0) * k
-    const x = Math.min(Math.max(cx - w / 2, -esquerda), IMG.largura - w)
-    let y = Math.min(Math.max(cy - h / 2, -topo), IMG.altura - h + baixo)
-    // sobrou espaço em cima e embaixo: deixa a imagem no meio da parte livre
-    if (h - topo - baixo > IMG.altura) y = IMG.altura / 2 - (topo + h - baixo) / 2
+    const direita = (margem?.direita || 0) * k
+    const entre = (val, a, b) => Math.min(Math.max(val, Math.min(a, b)), Math.max(a, b))
+    const x = entre(cx - w / 2, 0, IMG.largura - w + direita)
+    let y = entre(cy - h / 2, -topo, IMG.altura - h + baixo)
+    // sobrou espaço em cima e embaixo (celular): deixa a imagem no meio da parte livre
+    if (h - topo - baixo > IMG.altura && baixo > 0) y = IMG.altura / 2 - (topo + h - baixo) / 2
     return { x, y, w, h }
   }
 
@@ -134,23 +143,23 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
   function enquadrar(b, manter, mover, soManter) {
     const topo = margem?.topo || 0
     const baixo = margem?.baixo || 0
-    const esquerda = margem?.esquerda || 0
+    const direita = margem?.direita || 0
     const livreH = Math.max(tam.h - topo - baixo, 120)
-    const livreW = Math.max(tam.w - esquerda - 24, 120)
+    const livreW = Math.max(tam.w - direita - 24, 120)
     // escala (unidades do mapa por pixel), sem passar do zoom máximo e do mínimo
     const maxEscala = (soManter ? maxNormal() : IMG.largura) / tam.w
     const escala = (mover || soManter) && vb ? vb.w / tam.w
       : Math.min(Math.max(Math.max(b.w / livreW, b.h / livreH) * 1.08, Math.max(120, tam.w / 5) / tam.w), maxEscala)
     let v = soManter && vb ? { ...vb } : {
-      x: b.x + b.w / 2 - (esquerda + 12 + livreW / 2) * escala,
+      x: b.x + b.w / 2 - (12 + livreW / 2) * escala,
       y: b.y + b.h / 2 - (topo + livreH / 2) * escala,
       w: tam.w * escala,
       h: tam.h * escala,
     }
     if (manter) {
       const folga = 60 * escala
-      const x1 = v.x + esquerda * escala + folga
-      const x2 = v.x + v.w - folga
+      const x1 = v.x + folga
+      const x2 = v.x + v.w - direita * escala - folga
       const y1 = v.y + topo * escala + folga
       const y2 = v.y + v.h - baixo * escala - folga
       const dx = manter.x < x1 ? manter.x - x1 : manter.x > x2 ? manter.x - x2 : 0
@@ -168,8 +177,17 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
 
   // "fresco": o enquadramento ainda não foi mexido pela pessoa (arrastar, zoom, toque)
   const fresco = useRef(true)
+  // abertura no computador: o mapa ocupa a tela toda (sem faixas), começando pelo lado esquerdo,
+  // onde ficam os patrocinadores; o painel fica à direita e não cobre nada importante
+  function mapaInteiro() {
+    const w = maxNormal()
+    const h = w * (tam.h / tam.w)
+    setVb(limitar({ x: 0, y: (IMG.altura - h) / 2, w, h }))
+  }
+
   function aplicarFoco() {
-    if (foco?.pavilhao) abrirPavilhao(foco.centro)
+    if (foco?.inteiro) mapaInteiro()
+    else if (foco?.pavilhao) abrirPavilhao(foco.centro)
     else if (foco) enquadrar(foco.caixa, foco.manter, foco.mover, foco.soManter)
   }
   useEffect(() => {
@@ -177,13 +195,25 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     fresco.current = true
     aplicarFoco()
   }, [foco, tam.w, tam.h]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // abertura (celular): mostra os patrocinadores e fica parado ali até a pessoa mexer no mapa
+  // (arrastar ou dar zoom). A partir daí a navegação é normal.
+  const abertura = useRef(false)
+  useEffect(() => {
+    abertura.current = !!foco?.depois
+  }, [foco])
+  function encerrarAbertura() {
+    if (!abertura.current) return
+    abertura.current = false
+    aoFimAbertura?.(null)
+  }
   // o painel mudou de tamanho: só refaz se a pessoa ainda não mexeu no mapa;
   // se já mexeu, o mapa fica onde está (no máximo arrasta o lugar escolhido para fora de trás do painel)
   useEffect(() => {
     if (!tam.w || !foco || !vb) return
     if (fresco.current) aplicarFoco()
     else if (foco.manter) enquadrar(foco.caixa, foco.manter, false, true)
-  }, [margem?.baixo, margem?.esquerda]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [margem?.baixo, margem?.direita]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // aproxima o Pavilhão o suficiente para "abrir o telhado" e mostrar as atrações
   // o telhado "abre" com o mapa aproximado, ou quando o Pavilhão inteiro já cabe na largura livre da tela
@@ -194,22 +224,22 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
   // aproxima até abrir o telhado. No computador o Pavilhão cabe inteiro;
   // no celular fica no zoom de ver as atrações e dá para arrastar para os lados.
   function abrirPavilhao(centro) {
-    const esqPx = margem?.esquerda || 0
-    const cabe = (PW * 1.06) / (tam.w - esqPx - 16)
+    const dirPx = margem?.direita || 0
+    const cabe = (PW * 1.06) / (tam.w - dirPx - 16)
     const k = Math.max(Math.min(cabe, ZOOM_PLANTA * 0.92), Math.max(120, tam.w / 5) / tam.w)
     const w = tam.w * k, h = tam.h * k
     const baixo = (margem?.baixo || 0) * k
-    const livreW = (tam.w - esqPx) * k
+    const livreW = (tam.w - dirPx) * k
     const c = centro || { x: PX + PW / 2, y: PY + PH / 2 }
-    animarPara(limitar({ x: c.x - esqPx * k - livreW / 2, y: c.y - (h - baixo) / 2, w, h }))
+    animarPara(limitar({ x: c.x - livreW / 2, y: c.y - (h - baixo) / 2, w, h }))
   }
 
 
 
   // centro da parte do mapa que não fica atrás do painel (os botões + e − aproximam ali)
   const centroLivre = () => {
-    const esq = margem?.esquerda || 0
-    return { x: esq + (tam.w - esq) / 2, y: (tam.h - (margem?.baixo || 0)) / 2 }
+    const dir = margem?.direita || 0
+    return { x: (tam.w - dir) / 2, y: (tam.h - (margem?.baixo || 0)) / 2 }
   }
 
   function zoomEm(px, py, fator) {
@@ -230,6 +260,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     function roda(e) {
       e.preventDefault()
       fresco.current = false
+      encerrarAbertura()
       pararAnimacao()
       const r = el.getBoundingClientRect()
       zoomEm(e.clientX - r.left, e.clientY - r.top, e.deltaY > 0 ? 1.15 : 1 / 1.15)
@@ -245,6 +276,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
 
   function aoPressionar(e) {
     fresco.current = false
+    encerrarAbertura()
     pararAnimacao()
     e.currentTarget.setPointerCapture(e.pointerId)
     ponteiros.current.set(e.pointerId, pos(e))
@@ -298,7 +330,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
     // toque perto de um número escolhe esse lugar
     const raio = Math.max(26, 26 * (vb.w / tam.w))
     let perto = null
-    for (const l of dentroAberto ? [] : numerados) {
+    for (const l of dentroAberto ? [] : [...numerados, ...extrasFora]) {
       const d = Math.hypot(l.x - ponto.x, l.y - ponto.y)
       if (d < raio && (!perto || d < perto.d)) perto = { l, d }
     }
@@ -352,7 +384,9 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       const larg = Math.min(destino.nome.length * 8 + 56, 230)
       ocupado.push({ x1: etiqueta.x - larg / 2, x2: etiqueta.x + larg / 2, y1: etiqueta.y - 72, y2: etiqueta.y - 26 })
     }
+    const painelPC = margem?.direita ? { x1: tam.w - margem.direita, x2: tam.w, y1: tam.h - (margem.alturaPainel || 0), y2: tam.h } : null
     const livre = (r) => r.x1 >= 4 && r.x2 <= tam.w - 4 && r.y1 >= 4 && r.y2 <= tam.h - (margem?.baixo || 0) - 4
+      && !(painelPC && r.x1 < painelPC.x2 && r.x2 > painelPC.x1 && r.y1 < painelPC.y2 && r.y2 > painelPC.y1)
       && !ocupado.some((o) => r.x1 < o.x2 && r.x2 > o.x1 && r.y1 < o.y2 && r.y2 > o.y1)
     if (aberto) {
       // nomes das atrações ao lado do ponto (mesmo estilo dos de fora)
@@ -392,7 +426,11 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       const b = naTela({ x: PX + PW, y: PY + PH })
       ocupado.push({ x1: a.x, x2: b.x, y1: a.y, y2: b.y + 24 })
     }
-    const ordem = numerados.filter((l) => !(aberto && dentroDaPlanta(l)))
+    for (const l of extrasFora) {
+      const t = naTela(l)
+      ocupado.push({ x1: t.x - 11, x2: t.x + 11, y1: t.y - 11, y2: t.y + 11 })
+    }
+    const ordem = [...numerados, ...extrasFora].filter((l) => !(aberto && dentroDaPlanta(l)))
       .sort((a, b) => (origem?.id === b.id) - (origem?.id === a.id) || a.numero - b.numero)
     for (const l of ordem) {
       if (destino && l.id === destino.id) continue // o destino já tem a etiqueta com o nome
@@ -458,6 +496,9 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
             )
           })()}
 
+          {/* pontos de fora sem número (hidratação) */}
+          {extrasFora.filter((l) => l.id !== destino?.id).map((l) => <Ponto key={l.id} l={l} px={px} />)}
+
           {/* atrações de dentro do Pavilhão */}
           {aberto && internos.filter((l) => l.id !== destino?.id && l.id !== origem?.id).map((l) => <Ponto key={l.id} l={l} px={px} />)}
 
@@ -509,7 +550,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
         // fica no meio da parte do telhado que aparece na tela
         const a = naTela({ x: PX, y: PY })
         const b = naTela({ x: PX + PW, y: PY + PH })
-        const x1 = Math.max(a.x, (margem?.esquerda || 0) + 8), x2 = Math.min(b.x, tam.w - 8)
+        const x1 = Math.max(a.x, 8), x2 = Math.min(b.x, tam.w - (margem?.direita || 0) - 8)
         const y1 = Math.max(a.y, 8), y2 = Math.min(b.y, tam.h - (margem?.baixo || 0) - 8)
         if (x2 - x1 < 90 || y2 - y1 < 36) return null
         const t = { x: (x1 + x2) / 2, y: y1 + (y2 - y1) * 0.6 }
@@ -522,7 +563,7 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
         )
       })()}
 
-      <div className="controles" style={{ bottom: (margem?.baixo || 0) + 12 }}>
+      <div className="controles" style={{ bottom: (margem?.baixo || 0) + (margem?.alturaPainel || 0) + 12 }}>
         <button aria-label="Aproximar" onClick={() => zoomEm(centroLivre().x, centroLivre().y, 1 / 1.6)}>+</button>
         <button aria-label="Afastar" onClick={() => zoomEm(centroLivre().x, centroLivre().y, 1.6)}>−</button>
       </div>

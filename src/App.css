@@ -6,6 +6,7 @@
   --destino: #e5483b;
   --rota: #1a73e8;
   --numero: #1f5fd6;
+  --agua: #0ea5d8;
   color-scheme: light;
   font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--texto);
@@ -315,7 +316,7 @@ button { font-family: inherit; color: inherit; cursor: pointer; }
 button:focus-visible { outline: 3px solid var(--voce); outline-offset: 2px; }
 
 @media (min-width: 700px) {
-  .painel { left: 12px; right: auto; bottom: 12px; width: 380px; }
+  .painel { left: auto; right: 12px; bottom: 12px; width: 380px; }
   .lista-painel { max-height: 60dvh; }
 }
 
@@ -324,3 +325,15 @@ button:focus-visible { outline: 3px solid var(--voce); outline-offset: 2px; }
 /* as etiquetas "Você está aqui" e do destino deixam o toque passar para o mapa (só o X é clicável) */
 .voce-aqui, .etiqueta { pointer-events: none; }
 .voce-aqui button, .etiqueta button { pointer-events: auto; }
+
+/* programação do lugar */
+.agenda { max-height: 38dvh; overflow-y: auto; display: grid; gap: 8px; margin-top: 2px; }
+.agenda-dia { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--suave); margin-bottom: 4px; }
+.agenda ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.agenda li { display: flex; gap: 10px; align-items: flex-start; font-size: .86rem; line-height: 1.35; }
+.agenda-hora { flex: none; min-width: 84px; font-weight: 700; color: var(--voce); font-variant-numeric: tabular-nums; }
+.agenda-texto { display: grid; gap: 1px; min-width: 0; }
+.agenda-texto small { color: var(--suave); font-size: .76rem; }
+.agenda-onde { justify-self: start; font-style: normal; font-size: .7rem; font-weight: 600; color: var(--numero); background: #eaf1fd; border-radius: 6px; padding: 1px 6px; margin-bottom: 2px; }
+.agenda-site { justify-self: start; font-size: .8rem; font-weight: 700; color: var(--voce); }
+.numero.numero-agua { background: var(--agua); }
