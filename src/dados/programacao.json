@@ -3,8 +3,8 @@
   "atividades": [
     {
       "dia": "2026-11-04",
-      "inicio": "20:00",
-      "fim": "20:10",
+      "inicio": "19:30",
+      "fim": null,
       "tipo": "Apresentação cultural",
       "titulo": "Abertura Inventum - Show LightWire",
       "local": "exposicao-interna",
