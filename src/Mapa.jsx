@@ -465,7 +465,8 @@ export default function Mapa({ foco, margem, rota, origem, destino, aoTocar, aoL
       ocupado.push({ x1: t.x - r, x2: t.x + r, y1: t.y - r, y2: t.y + r })
     }
     const ordem = [...numerados, ...extrasFora].filter((l) => !(aberto && dentroDaPlanta(l)))
-      .sort((a, b) => (origem?.id === b.id) - (origem?.id === a.id) || a.numero - b.numero)
+      // "prioridade" no mapa.json: o nome desse lugar escolhe o espaço antes dos vizinhos (ex.: o 12, colado no 7)
+      .sort((a, b) => (origem?.id === b.id) - (origem?.id === a.id) || (b.prioridade || 0) - (a.prioridade || 0) || a.numero - b.numero)
     for (const l of ordem) {
       if (destino && l.id === destino.id) continue // o destino já tem a etiqueta com o nome
       const t = naTela(l)

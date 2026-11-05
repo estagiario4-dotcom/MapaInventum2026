@@ -85,7 +85,7 @@
    "id": "pebolim-humano",
    "nome": "Pebolim Humano",
    "rotulo": "Pebolim Humano",
-   "x": 465,
+   "x": 614,
    "y": 422,
    "no": "m3"
   },
@@ -132,7 +132,8 @@
    "rotulo": "Carreta SESI",
    "x": 642,
    "y": 422,
-   "no": "s2"
+   "no": "s2",
+   "prioridade": 1
   },
   {
    "numero": 13,
