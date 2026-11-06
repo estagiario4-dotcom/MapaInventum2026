@@ -282,15 +282,6 @@
       "inicio": "13:00",
       "fim": "17:00",
       "tipo": "Palestra",
-      "titulo": "Mentoria à Mesa com ITECPB",
-      "local": "pavilhao-palco-startup",
-      "localNoSite": "Palco Startups"
-    },
-    {
-      "dia": "2026-11-06",
-      "inicio": "13:00",
-      "fim": "17:00",
-      "tipo": "Palestra",
       "titulo": "Olhares que protegem uma Pato Branco amiga da pessoa Idosa",
       "local": "espaco-desafio",
       "localNoSite": "Espaço Desafio"
@@ -312,6 +303,15 @@
       "titulo": "Encontro CSC - Cidade Inteligentes",
       "local": "auditorio-cultura",
       "localNoSite": "Auditório Cultura"
+    },
+    {
+      "dia": "2026-11-06",
+      "inicio": "14:30",
+      "fim": "17:00",
+      "tipo": "Palestra",
+      "titulo": "Mentoria à Mesa com ITECPB",
+      "local": "pavilhao-palco-startup",
+      "localNoSite": "Palco Startups"
     },
     {
       "dia": "2026-11-06",
@@ -454,15 +454,6 @@
     },
     {
       "dia": "2026-11-07",
-      "inicio": "15:30",
-      "fim": "22:00",
-      "tipo": "Competição",
-      "titulo": "UTFPR In Concert",
-      "local": "carreta-sesi",
-      "localNoSite": "Carreta Palco SESI"
-    },
-    {
-      "dia": "2026-11-07",
       "inicio": "16:00",
       "fim": "22:00",
       "tipo": "Palestra",
@@ -533,6 +524,15 @@
       "titulo": "O Engenheiro do Século XXI: O poder das Soft Skills na carreira técnica",
       "local": "pavilhao-palco-startup",
       "localNoSite": "Palco Startups"
+    },
+    {
+      "dia": "2026-11-08",
+      "inicio": "16:00",
+      "fim": null,
+      "tipo": "Competição",
+      "titulo": "UTFPR In Concert",
+      "local": "carreta-sesi",
+      "localNoSite": "Carreta Palco SESI"
     },
     {
       "dia": "2026-11-08",
